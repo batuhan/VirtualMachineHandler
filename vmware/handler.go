@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
-func Create(w http.ResponseWriter, _ *http.Request) {
-	_, _ = fmt.Fprint(w, "test")
+func Env(w http.ResponseWriter, _ *http.Request) {
+	out := execute("env")
+	_, _ = fmt.Fprintf(w, out)
 }

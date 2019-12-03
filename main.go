@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/create_server", vmware.Create)
+	http.HandleFunc("/env", vmware.Env)
 	_ = http.ListenAndServe(":8080", nil)
 }
