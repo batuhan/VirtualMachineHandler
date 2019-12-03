@@ -16,6 +16,7 @@ func execute(baseEnv string, arg ...string) ([]byte, error) {
 		"GOVC_RESOURCE_POOL=" + os.Getenv(baseEnv+"_GOVC_RESOURCE_POOL"),
 		"GOVC_PASSWORD=" + os.Getenv(baseEnv+"_GOVC_PASSWORD"),
 		"GOVC_RESOURCE_POOL=" + os.Getenv(baseEnv+"_GOVC_RESOURCE_POOL"),
+		"GOVC_VM=" + os.Getenv(baseEnv+"_GOVC_VM"),
 	}
 	out, err := cmd.CombinedOutput()
 	return out, err
