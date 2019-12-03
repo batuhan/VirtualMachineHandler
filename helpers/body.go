@@ -7,6 +7,7 @@ import (
 
 type Body struct {
 	Identifier string
+	TargetName string
 }
 
 func GetBody(reqBody io.ReadCloser) Body {
