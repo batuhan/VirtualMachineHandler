@@ -8,6 +8,7 @@ import (
 func execute(baseEnv string, arg ...string) ([]byte, error) {
 	cmd := exec.Command("govc", arg...)
 	cmd.Env = []string{
+		"GOVC_INSECURE=" + os.Getenv("GOVC_INSECURE"),
 		"GOVC_URL=" + os.Getenv(baseEnv+"_GOVC_URL"),
 		"GOVC_USERNAME=" + os.Getenv(baseEnv+"_GOVC_USERNAME"),
 		"GOVC_PASSWORD=" + os.Getenv(baseEnv+"_GOVC_PASSWORD"),
