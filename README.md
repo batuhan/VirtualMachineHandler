@@ -9,12 +9,15 @@ IDENTIFIER_GOVC_DATACENTER=xxx
 IDENTIFIER_GOVC_DATASTORE=xxx
 IDENTIFIER_GOVC_RESOURCE_POOL=xxx
 
-IDENTIFIER_TEMPLATE_NAME=xxx
 IDENTIFIER_TARGET_DIRECTORY=xxx
 ```
 pass identifier in the request body, like this:
 ```json
 {
-  "identifier": "IDENTIFIER"
+  "identifier": "IDENTIFIER",
+  "template": "Ubuntu1804",
+  "targetName": "UbuntuTarget",
+  "cpu": 1,
+  "memory": 1024
 }
 ```

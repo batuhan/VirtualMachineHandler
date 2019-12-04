@@ -7,6 +7,7 @@ import (
 
 type Body struct {
 	Identifier string
+	Template   string
 	TargetName string
 	Cpu        int
 	Memory     int

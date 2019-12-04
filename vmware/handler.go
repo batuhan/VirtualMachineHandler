@@ -23,8 +23,8 @@ func Env(w http.ResponseWriter, req *http.Request) {
 func Create(w http.ResponseWriter, req *http.Request) {
 	body := helpers.GetBody(req.Body)
 
-	out, err := execute(body.Identifier, "vm.clone", "-vm="+os.Getenv(body.Identifier+"_TEMPLATE_NAME"),
-		"-on=false", "-c="+strconv.Itoa(body.Cpu), "-m="+strconv.Itoa(body.Memory), body.TargetName)
+	out, err := execute(body.Identifier, "vm.clone", "-vm="+body.Template, "-on=false",
+		"-c="+strconv.Itoa(body.Cpu), "-m="+strconv.Itoa(body.Memory), body.TargetName)
 	if err != nil {
 		http.Error(w, err.Error()+"\n"+string(out), http.StatusBadRequest)
 		return
