@@ -11,6 +11,7 @@ type Body struct {
 	TargetName string
 	Cpu        int
 	Memory     int
+	DiskSize   string
 }
 
 func GetBody(reqBody io.ReadCloser) Body {

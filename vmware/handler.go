@@ -30,11 +30,24 @@ func Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	out, err = execute(body.Identifier, "object.mv", "./vm/"+body.TargetName, os.Getenv(body.Identifier+"_TARGET_DIRECTORY"))
+	out, err = execute(body.Identifier, "object.mv", "./vm/"+body.TargetName,
+		os.Getenv(body.Identifier+"_TARGET_DIRECTORY"))
 	if err != nil {
 		http.Error(w, err.Error()+"\n"+string(out), http.StatusBadRequest)
 		return
 	}
 
-	_, _ = fmt.Fprintf(w, string(out))
+	out, err = execute(body.Identifier, "vm.disk.change", "-vm="+body.TargetName, "-size="+body.DiskSize)
+	if err != nil {
+		http.Error(w, err.Error()+"\n"+string(out), http.StatusBadRequest)
+		return
+	}
+
+	out, err = execute(body.Identifier, "vm.power", "-on=true", body.TargetName)
+	if err != nil {
+		http.Error(w, err.Error()+"\n"+string(out), http.StatusBadRequest)
+		return
+	}
+
+	_, _ = fmt.Fprintf(w, "OK")
 }

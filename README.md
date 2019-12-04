@@ -18,6 +18,7 @@ pass identifier in the request body, like this:
   "template": "Ubuntu1804",
   "targetName": "UbuntuTarget",
   "cpu": 1,
-  "memory": 1024
+  "memory": 1024,
+  "diskSize": "100G"
 }
 ```
