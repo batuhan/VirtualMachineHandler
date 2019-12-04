@@ -1,12 +1,14 @@
 package vmware
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 )
 
 func execute(baseEnv string, arg ...string) ([]byte, error) {
 	cmd := exec.Command("govc", arg...)
+	fmt.Println(arg)
 	cmd.Env = []string{
 		"GOVC_INSECURE=" + os.Getenv("GOVC_INSECURE"),
 		"GOVC_URL=" + os.Getenv(baseEnv+"_GOVC_URL"),
