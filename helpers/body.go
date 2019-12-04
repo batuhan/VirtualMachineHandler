@@ -8,6 +8,8 @@ import (
 type Body struct {
 	Identifier string
 	TargetName string
+	Cpu        int
+	Memory     int
 }
 
 func GetBody(reqBody io.ReadCloser) Body {

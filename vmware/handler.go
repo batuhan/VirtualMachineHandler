@@ -5,6 +5,7 @@ import (
 	"github.com/nodgroup/VirtualMachineHandler/helpers"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 func Env(w http.ResponseWriter, req *http.Request) {
@@ -22,7 +23,8 @@ func Env(w http.ResponseWriter, req *http.Request) {
 func Create(w http.ResponseWriter, req *http.Request) {
 	body := helpers.GetBody(req.Body)
 
-	out, err := execute(body.Identifier, "vm.clone", "-vm="+os.Getenv(body.Identifier+"_TEMPLATE_NAME"), "-on=false", body.TargetName)
+	out, err := execute(body.Identifier, "vm.clone", "-vm="+os.Getenv(body.Identifier+"_TEMPLATE_NAME"),
+		"-on=false", "-c="+strconv.Itoa(body.Cpu), "-m="+strconv.Itoa(body.Memory), body.TargetName)
 	if err != nil {
 		http.Error(w, err.Error()+"\n"+string(out), http.StatusBadRequest)
 		return
