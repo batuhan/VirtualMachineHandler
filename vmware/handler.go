@@ -3,7 +3,7 @@ package vmware
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/nodgroup/VirtualMachineHandler/helpers"
+	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
 	"gopkg.in/yaml.v2"
 	"net/http"
 	"os"

@@ -1,4 +1,4 @@
-module github.com/nodgroup/VirtualMachineHandler
+module gitlab.com/nod/bigcore/VirtualMachineHandler
 
 go 1.13
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/nodgroup/VirtualMachineHandler/vmware"
+	"gitlab.com/nod/bigcore/VirtualMachineHandler/vmware"
 	"net/http"
 )
 
