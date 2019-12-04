@@ -26,3 +26,5 @@ pass identifier in the request body, like this:
   "ipToAssign": "1.1.1.1"
 }
 ```
+
+template names must contain either `ubuntu` or `centos`, lower/upper case doesn't matter
