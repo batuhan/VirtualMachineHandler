@@ -19,6 +19,7 @@ pass identifier in the request body, like this:
   "targetName": "UbuntuTarget",
   "cpu": 1,
   "memory": 1024,
-  "diskSize": "100G"
+  "diskSize": "100G",
+  "sshKey": "ssh-key"
 }
 ```
