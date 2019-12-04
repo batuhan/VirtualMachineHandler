@@ -13,6 +13,7 @@ type Body struct {
 	Memory     int
 	DiskSize   string
 	SshKey     string
+	IpToAssign string
 }
 
 func GetBody(reqBody io.ReadCloser) Body {
