@@ -69,10 +69,9 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 	userData = append([]byte("#cloud-config\n"), userData...)
 
 	helpers.SendWebhook(helpers.Webhook{
-		Uuid:             uuid.String(),
-		Step:             "templateGeneration",
-		Success:          true,
-		ErrorExplanation: "",
+		Uuid:    uuid.String(),
+		Step:    "templateGeneration",
+		Success: true,
 	})
 
 	out, err := execute(body.Identifier, true, "vm.clone", "-vm="+body.Template, "-on=false",
@@ -89,10 +88,9 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		return
 	}
 	helpers.SendWebhook(helpers.Webhook{
-		Uuid:             uuid.String(),
-		Step:             "createVM",
-		Success:          true,
-		ErrorExplanation: "",
+		Uuid:    uuid.String(),
+		Step:    "createVM",
+		Success: true,
 	})
 
 	out, err = execute(body.Identifier, true, "object.mv", "./vm/"+body.TargetName,
@@ -109,10 +107,9 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		return
 	}
 	helpers.SendWebhook(helpers.Webhook{
-		Uuid:             uuid.String(),
-		Step:             "moveVMToTargetDirectory",
-		Success:          true,
-		ErrorExplanation: "",
+		Uuid:    uuid.String(),
+		Step:    "moveVMToTargetDirectory",
+		Success: true,
 	})
 
 	out, err = execute(body.Identifier, true, "vm.disk.change", "-vm="+body.TargetName, "-size="+body.DiskSize)
@@ -128,10 +125,9 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		return
 	}
 	helpers.SendWebhook(helpers.Webhook{
-		Uuid:             uuid.String(),
-		Step:             "changeVMDiskSize",
-		Success:          true,
-		ErrorExplanation: "",
+		Uuid:    uuid.String(),
+		Step:    "changeVMDiskSize",
+		Success: true,
 	})
 
 	out, err = execute(body.Identifier, false, "vm.change", "-vm="+body.TargetName,
@@ -148,10 +144,9 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		return
 	}
 	helpers.SendWebhook(helpers.Webhook{
-		Uuid:             uuid.String(),
-		Step:             "addCloudInitTemplate",
-		Success:          true,
-		ErrorExplanation: "",
+		Uuid:    uuid.String(),
+		Step:    "addCloudInitTemplate",
+		Success: true,
 	})
 
 	out, err = execute(body.Identifier, true, "vm.power", "-on=true", body.TargetName)
@@ -167,9 +162,8 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		return
 	}
 	helpers.SendWebhook(helpers.Webhook{
-		Uuid:             uuid.String(),
-		Step:             "powerOnVM",
-		Success:          true,
-		ErrorExplanation: "",
+		Uuid:    uuid.String(),
+		Step:    "powerOnVM",
+		Success: true,
 	})
 }
