@@ -1,4 +1,4 @@
-required env variables
+## env variables
 ```
 GOVC_INSECURE=1
 
@@ -15,7 +15,10 @@ IDENTIFIER_NAMESERVERS=8.8.8.8,8.8.4.4
 
 WEBHOOK_URL=xxx
 ```
-pass identifier in the request body, like this:
+pass identifier in the request body, like below
+
+## example requests
+### create
 ```json
 {
   "identifier": "IDENTIFIER",
