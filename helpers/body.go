@@ -3,6 +3,7 @@ package helpers
 import (
 	"encoding/json"
 	"io"
+	"log"
 )
 
 type Body struct {
@@ -18,6 +19,9 @@ type Body struct {
 
 func GetBody(reqBody io.ReadCloser) Body {
 	body := Body{}
-	_ = json.NewDecoder(reqBody).Decode(&body)
+	err := json.NewDecoder(reqBody).Decode(&body)
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return body
 }
