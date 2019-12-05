@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/sethvargo/go-password/password"
 	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
 	"gopkg.in/yaml.v2"
 	"log"
@@ -27,6 +28,18 @@ func Env(w http.ResponseWriter, req *http.Request) {
 }
 
 func Create(body helpers.Body, uuid uuid.UUID) {
+	pass, err := password.Generate(12, 2, 2, false, false)
+	if err != nil {
+		log.Println(err.Error())
+		helpers.SendWebhook(helpers.Webhook{
+			Uuid:             uuid.String(),
+			Step:             "passwordGeneration",
+			Success:          false,
+			ErrorExplanation: "INTERNAL ERROR",
+		})
+		return
+	}
+
 	networkTemplateObject := helpers.CreateNetworkTemplate(body.Identifier, body.IpToAssign)
 	networkTemplate, err := yaml.Marshal(networkTemplateObject)
 	if err != nil {
@@ -42,17 +55,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 
 	template := helpers.GenerateBaseTemplate(body.SshKey)
 	if strings.Contains(strings.ToLower(body.Template), "ubuntu") {
-		template, err = helpers.AddUbuntuSpecificParameters(template, networkTemplate)
-	}
-	if err != nil {
-		log.Println(err.Error())
-		helpers.SendWebhook(helpers.Webhook{
-			Uuid:             uuid.String(),
-			Step:             "templateGeneration",
-			Success:          false,
-			ErrorExplanation: "INTERNAL ERROR",
-		})
-		return
+		template = helpers.AddUbuntuSpecificParameters(template, pass, networkTemplate)
 	}
 
 	userData, err := yaml.Marshal(template)

@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"encoding/base64"
-	"github.com/sethvargo/go-password/password"
 	"os"
 	"strings"
 )
@@ -69,19 +68,15 @@ func GenerateBaseTemplate(sshKey string) *Template {
 	return &template
 }
 
-func AddUbuntuSpecificParameters(template *Template, networkTemplate []byte) (*Template, error) {
+func AddUbuntuSpecificParameters(template *Template, pass string, networkTemplate []byte) *Template {
 	newTemplate := template
 
 	newTemplate.Users[0].Name = "ubuntu"
-	pass, err := password.Generate(12, 2, 2, false, false)
-	if err != nil {
-		return nil, err
-	}
 	newTemplate.Chpasswd.List = []string{"ubuntu:" + pass, "root:" + pass}
 
 	newTemplate.WriteFiles = []WriteFile{{Encoding: "base64", Content: base64.StdEncoding.EncodeToString(networkTemplate), Path: "/etc/netplan/50-cloud-init.yaml"}}
 	newTemplate.Runcmd = []string{"netplan apply"}
-	return newTemplate, nil
+	return newTemplate
 }
 
 func CreateNetworkTemplate(identifier string, ipToAssign string) *Network {
