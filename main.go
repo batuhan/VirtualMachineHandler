@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
 	"gitlab.com/nod/bigcore/VirtualMachineHandler/vmware"
+	"log"
 	"net/http"
 	"net/http/httputil"
 )
@@ -20,7 +21,7 @@ func main() {
 	})
 	http.HandleFunc("/dump", func(w http.ResponseWriter, req *http.Request) {
 		dump, _ := httputil.DumpRequest(req, true)
-		fmt.Println(string(dump))
+		log.Println(string(dump))
 	})
 	_ = http.ListenAndServe(":8080", nil)
 }
