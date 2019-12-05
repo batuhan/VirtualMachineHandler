@@ -16,7 +16,7 @@ import (
 func Env(w http.ResponseWriter, req *http.Request) {
 	body := helpers.GetBody(req.Body)
 
-	out, err := execute(body.Identifier, "env")
+	out, err := execute(body.Identifier, true, "env")
 	if err != nil {
 		log.Println(err.Error())
 		log.Println(string(out))
@@ -75,7 +75,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		ErrorExplanation: "",
 	})
 
-	out, err := execute(body.Identifier, "vm.clone", "-vm="+body.Template, "-on=false",
+	out, err := execute(body.Identifier, true, "vm.clone", "-vm="+body.Template, "-on=false",
 		"-c="+strconv.Itoa(body.Cpu), "-m="+strconv.Itoa(body.Memory), body.TargetName)
 	if err != nil {
 		log.Println(err.Error())
@@ -95,7 +95,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		ErrorExplanation: "",
 	})
 
-	out, err = execute(body.Identifier, "object.mv", "./vm/"+body.TargetName,
+	out, err = execute(body.Identifier, true, "object.mv", "./vm/"+body.TargetName,
 		os.Getenv(body.Identifier+"_TARGET_DIRECTORY"))
 	if err != nil {
 		log.Println(err.Error())
@@ -115,7 +115,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		ErrorExplanation: "",
 	})
 
-	out, err = execute(body.Identifier, "vm.disk.change", "-vm="+body.TargetName, "-size="+body.DiskSize)
+	out, err = execute(body.Identifier, true, "vm.disk.change", "-vm="+body.TargetName, "-size="+body.DiskSize)
 	if err != nil {
 		log.Println(err.Error())
 		log.Println(string(out))
@@ -134,7 +134,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		ErrorExplanation: "",
 	})
 
-	out, err = execute(body.Identifier, "vm.change", "-vm="+body.TargetName,
+	out, err = execute(body.Identifier, false, "vm.change", "-vm="+body.TargetName,
 		"-e=guestinfo.userdata=\""+base64.StdEncoding.EncodeToString(userData)+"\"", "-e=guestinfo.userdata.encoding=base64")
 	if err != nil {
 		log.Println(err.Error())
@@ -154,7 +154,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		ErrorExplanation: "",
 	})
 
-	out, err = execute(body.Identifier, "vm.power", "-on=true", body.TargetName)
+	out, err = execute(body.Identifier, true, "vm.power", "-on=true", body.TargetName)
 	if err != nil {
 		log.Println(err.Error())
 		log.Println(string(out))

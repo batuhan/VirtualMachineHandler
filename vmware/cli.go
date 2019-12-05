@@ -6,9 +6,11 @@ import (
 	"os/exec"
 )
 
-func execute(baseEnv string, arg ...string) ([]byte, error) {
+func execute(baseEnv string, doLog bool, arg ...string) ([]byte, error) {
 	cmd := exec.Command("govc", arg...)
-	log.Println(cmd.Args)
+	if doLog {
+		log.Println(cmd.Args)
+	}
 	cmd.Env = []string{
 		"GOVC_INSECURE=" + os.Getenv("GOVC_INSECURE"),
 		"GOVC_URL=" + os.Getenv(baseEnv+"_GOVC_URL"),
