@@ -12,11 +12,18 @@ import (
 func main() {
 	http.HandleFunc("/env", vmware.Env)
 	http.HandleFunc("/create", func(w http.ResponseWriter, req *http.Request) {
-		newUUID := helpers.GenerateUUID()
-		_, _ = fmt.Fprint(w, newUUID)
+		uuid := helpers.GenerateUUID()
+		_, _ = fmt.Fprint(w, uuid)
 		body := helpers.GetBody(req.Body)
 
-		go vmware.Create(body, newUUID)
+		go vmware.Create(body, uuid)
+	})
+	http.HandleFunc("/delete", func(w http.ResponseWriter, req *http.Request) {
+		uuid := helpers.GenerateUUID()
+		_, _ = fmt.Fprint(w, uuid)
+		body := helpers.GetBody(req.Body)
+
+		go vmware.Delete(body, uuid)
 	})
 	http.HandleFunc("/dump", func(w http.ResponseWriter, req *http.Request) {
 		dump, _ := httputil.DumpRequest(req, true)

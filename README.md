@@ -37,5 +37,12 @@ pass identifier in the request body, like below
   "ipToAssign": "1.1.1.1"
 }
 ```
+### delete
+```json
+{
+  "identifier": "IDENTIFIER",
+  "targetName": "UbuntuTarget"
+}
+```
 
 template names must contain either `ubuntu` or `centos`, lower/upper case doesn't matter
