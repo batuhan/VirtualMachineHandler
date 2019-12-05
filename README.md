@@ -18,6 +18,12 @@ WEBHOOK_URL=xxx
 pass identifier in the request body, like below
 
 ## example requests
+### env
+```json
+{
+  "identifier": "CENTER2"
+}
+```
 ### create
 ```json
 {
