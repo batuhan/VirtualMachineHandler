@@ -200,3 +200,101 @@ func Recreate(body helpers.Body, uuid uuid.UUID) {
 	}
 	Create(body, uuid)
 }
+
+func Update(body helpers.Body, uuid uuid.UUID) {
+	out, err := execute(body.Identifier, true, "vm.power", "-off=true", body.TargetName)
+	if err != nil {
+		log.Println(err.Error())
+		log.Println(string(out))
+		// disable webhook since vm power off is a pre-condition and a already closed vm will throw an error
+		//helpers.SendWebhook(helpers.Webhook{
+		//	Uuid:             uuid.String(),
+		//	Step:             "powerOffVM",
+		//	Success:          false,
+		//	ErrorExplanation: err.Error() + "\n" + string(out),
+		//})
+	}
+	helpers.SendWebhook(helpers.Webhook{
+		Uuid:    uuid.String(),
+		Step:    "powerOffVM",
+		Success: true,
+	})
+
+	if body.Cpu != 0 {
+		out, err := execute(body.Identifier, true, "vm.change", "-vm="+body.TargetName, "-c="+strconv.Itoa(body.Cpu))
+		if err != nil {
+			log.Println(err.Error())
+			log.Println(string(out))
+			helpers.SendWebhook(helpers.Webhook{
+				Uuid:             uuid.String(),
+				Step:             "updateCPU",
+				Success:          false,
+				ErrorExplanation: err.Error() + "\n" + string(out),
+			})
+			return
+		}
+		helpers.SendWebhook(helpers.Webhook{
+			Uuid:    uuid.String(),
+			Step:    "updateCPU",
+			Success: true,
+		})
+	}
+
+	if body.Memory != 0 {
+		out, err := execute(body.Identifier, true, "vm.change", "-vm="+body.TargetName, "-m="+strconv.Itoa(body.Memory))
+		if err != nil {
+			log.Println(err.Error())
+			log.Println(string(out))
+			helpers.SendWebhook(helpers.Webhook{
+				Uuid:             uuid.String(),
+				Step:             "updateMemory",
+				Success:          false,
+				ErrorExplanation: err.Error() + "\n" + string(out),
+			})
+			return
+		}
+		helpers.SendWebhook(helpers.Webhook{
+			Uuid:    uuid.String(),
+			Step:    "updateMemory",
+			Success: true,
+		})
+	}
+
+	if body.DiskSize != "" {
+		out, err := execute(body.Identifier, true, "vm.disk.change", "-vm="+body.TargetName, "-size="+body.DiskSize)
+		if err != nil {
+			log.Println(err.Error())
+			log.Println(string(out))
+			// disable error webhook for disk size since shrinking disk will always result in an error
+			//helpers.SendWebhook(helpers.Webhook{
+			//	Uuid:             uuid.String(),
+			//	Step:             "updateDiskSize",
+			//	Success:          false,
+			//	ErrorExplanation: err.Error() + "\n" + string(out),
+			//})
+		}
+		helpers.SendWebhook(helpers.Webhook{
+			Uuid:    uuid.String(),
+			Step:    "updateDiskSize",
+			Success: true,
+		})
+	}
+
+	out, err = execute(body.Identifier, true, "vm.power", "-on=true", body.TargetName)
+	if err != nil {
+		log.Println(err.Error())
+		log.Println(string(out))
+		helpers.SendWebhook(helpers.Webhook{
+			Uuid:             uuid.String(),
+			Step:             "powerOnVM",
+			Success:          false,
+			ErrorExplanation: err.Error() + "\n" + string(out),
+		})
+		return
+	}
+	helpers.SendWebhook(helpers.Webhook{
+		Uuid:    uuid.String(),
+		Step:    "powerOnVM",
+		Success: true,
+	})
+}

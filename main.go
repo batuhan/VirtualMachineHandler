@@ -34,6 +34,13 @@ func main() {
 
 		go vmware.Recreate(body, uuid)
 	})
+	http.HandleFunc("/update", func(w http.ResponseWriter, req *http.Request) {
+		uuid := helpers.GenerateUUID()
+		_, _ = fmt.Fprint(w, uuid)
+		body := helpers.GetBody(req.Body)
+
+		go vmware.Update(body, uuid)
+	})
 	http.HandleFunc("/dump", func(w http.ResponseWriter, req *http.Request) {
 		dump, _ := httputil.DumpRequest(req, true)
 		log.Println(string(dump))

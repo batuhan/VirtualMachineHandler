@@ -44,5 +44,16 @@ pass identifier in the request body, like below
   "targetName": "UbuntuTarget"
 }
 ```
+### update
+```json
+{
+  "identifier": "CENTER2",
+  "targetName": "UbuntuTarget",
+  "cpu": 1,
+  "memory": 1024,
+  "diskSize": "50G"
+}
+```
+`cpu`, `memory` and `diskSize` fields can be omitted, only provided values will be updated 
 
 template names must contain either `ubuntu` or `centos`, lower/upper case doesn't matter
