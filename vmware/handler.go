@@ -172,7 +172,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 	})
 }
 
-func Delete(body helpers.Body, uuid uuid.UUID) {
+func Delete(body helpers.Body, uuid uuid.UUID) error {
 	out, err := execute(body.Identifier, true, "vm.destroy", body.TargetName)
 	if err != nil {
 		log.Println(err.Error())
@@ -183,11 +183,20 @@ func Delete(body helpers.Body, uuid uuid.UUID) {
 			Success:          false,
 			ErrorExplanation: err.Error() + "\n" + string(out),
 		})
-		return
+		return err
 	}
 	helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "deleteVM",
 		Success: true,
 	})
+	return nil
+}
+
+func Recreate(body helpers.Body, uuid uuid.UUID) {
+	err := Delete(body, uuid)
+	if err != nil {
+		return
+	}
+	Create(body, uuid)
 }

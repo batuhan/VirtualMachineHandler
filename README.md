@@ -24,7 +24,7 @@ pass identifier in the request body, like below
   "identifier": "CENTER2"
 }
 ```
-### create
+### create / recreate
 ```json
 {
   "identifier": "IDENTIFIER",

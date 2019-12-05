@@ -23,7 +23,16 @@ func main() {
 		_, _ = fmt.Fprint(w, uuid)
 		body := helpers.GetBody(req.Body)
 
-		go vmware.Delete(body, uuid)
+		go func() {
+			_ = vmware.Delete(body, uuid)
+		}()
+	})
+	http.HandleFunc("/recreate", func(w http.ResponseWriter, req *http.Request) {
+		uuid := helpers.GenerateUUID()
+		_, _ = fmt.Fprint(w, uuid)
+		body := helpers.GetBody(req.Body)
+
+		go vmware.Recreate(body, uuid)
 	})
 	http.HandleFunc("/dump", func(w http.ResponseWriter, req *http.Request) {
 		dump, _ := httputil.DumpRequest(req, true)
