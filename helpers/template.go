@@ -77,7 +77,7 @@ func AddUbuntuSpecificParameters(template *Template, networkTemplate []byte) (*T
 	if err != nil {
 		return nil, err
 	}
-	newTemplate.Chpasswd.List = []string{"ubuntu:" + pass}
+	newTemplate.Chpasswd.List = []string{"ubuntu:" + pass, "root:" + pass}
 
 	newTemplate.WriteFiles = []WriteFile{{Encoding: "base64", Content: base64.StdEncoding.EncodeToString(networkTemplate), Path: "/etc/netplan/50-cloud-init.yaml"}}
 	newTemplate.Runcmd = []string{"netplan apply"}
