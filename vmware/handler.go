@@ -202,7 +202,7 @@ func Recreate(body helpers.Body, uuid uuid.UUID) {
 }
 
 func Update(body helpers.Body, uuid uuid.UUID) {
-	out, err := execute(body.Identifier, true, "vm.power", "-off=true", body.TargetName)
+	out, err := execute(body.Identifier, true, "vm.power", "-s=true", body.TargetName)
 	if err != nil {
 		log.Println(err.Error())
 		log.Println(string(out))
