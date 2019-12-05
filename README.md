@@ -55,5 +55,14 @@ pass identifier in the request body, like below
 }
 ```
 `cpu`, `memory` and `diskSize` fields can be omitted, only provided values will be updated 
-
+### state
+```json
+{
+  "identifier": "IDENTIFIER",
+  "targetName": "UbuntuTarget",
+  "action": "shutdown"
+}
+```
+`action` must be one of the following values: `on | off | suspend | shutdown | reboot`
+#### other
 template names must contain either `ubuntu` or `centos`, lower/upper case doesn't matter

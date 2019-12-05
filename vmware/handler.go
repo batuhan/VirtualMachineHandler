@@ -298,3 +298,47 @@ func Update(body helpers.Body, uuid uuid.UUID) {
 		Success: true,
 	})
 }
+
+func State(body helpers.Body, uuid uuid.UUID) {
+	nextState := ""
+
+	if body.Action == "on" {
+		nextState = "on"
+	} else if body.Action == "off" {
+		nextState = "off"
+	} else if body.Action == "suspend" {
+		nextState = "suspend"
+	} else if body.Action == "reset" {
+		nextState = "reset"
+	} else if body.Action == "shutdown" {
+		nextState = "s"
+	} else if body.Action == "reboot" {
+		nextState = "r"
+	} else {
+		helpers.SendWebhook(helpers.Webhook{
+			Uuid:             uuid.String(),
+			Step:             "VMStateChange",
+			Success:          false,
+			ErrorExplanation: "need valid action value",
+		})
+		return
+	}
+
+	out, err := execute(body.Identifier, true, "vm.power", "-"+nextState+"=true", body.TargetName)
+	if err != nil {
+		log.Println(err.Error())
+		log.Println(string(out))
+		helpers.SendWebhook(helpers.Webhook{
+			Uuid:             uuid.String(),
+			Step:             "VMStateChange",
+			Success:          false,
+			ErrorExplanation: err.Error() + "\n" + string(out),
+		})
+		return
+	}
+	helpers.SendWebhook(helpers.Webhook{
+		Uuid:    uuid.String(),
+		Step:    "VMStateChange",
+		Success: true,
+	})
+}
