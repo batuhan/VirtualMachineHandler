@@ -60,7 +60,7 @@ func GenerateBaseTemplate(sshKey string) *Template {
 		SshAuthorizedKeys: []string{sshKey},
 	}}
 
-	template.Chpasswd.Expire = true
+	template.Chpasswd.Expire = false
 
 	template.Growpart.Mode = "auto"
 	template.Growpart.Devices = []string{"/"}
@@ -73,7 +73,7 @@ func AddUbuntuSpecificParameters(template *Template, networkTemplate []byte) (*T
 	newTemplate := template
 
 	newTemplate.Users[0].Name = "ubuntu"
-	pass, err := password.Generate(64, 10, 10, false, false)
+	pass, err := password.Generate(12, 2, 2, false, false)
 	if err != nil {
 		return nil, err
 	}
