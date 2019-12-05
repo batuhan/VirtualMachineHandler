@@ -12,6 +12,8 @@ IDENTIFIER_GOVC_RESOURCE_POOL=xxx
 IDENTIFIER_TARGET_DIRECTORY=xxx
 IDENTIFIER_GATEWAY=xxx
 IDENTIFIER_NAMESERVERS=8.8.8.8,8.8.4.4
+
+WEBHOOK_URL=xxx
 ```
 pass identifier in the request body, like this:
 ```json
