@@ -165,8 +165,9 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		return
 	}
 	helpers.SendWebhook(helpers.Webhook{
-		Uuid:    uuid.String(),
-		Step:    "powerOnVM",
-		Success: true,
+		Uuid:     uuid.String(),
+		Step:     "powerOnVM",
+		Success:  true,
+		Password: pass,
 	})
 }

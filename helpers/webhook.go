@@ -12,7 +12,8 @@ type Webhook struct {
 	Uuid             string `json:"uuid"`
 	Step             string `json:"step"`
 	Success          bool   `json:"success"`
-	ErrorExplanation string `json:"errorExplanation"`
+	ErrorExplanation string `json:"errorExplanation,omitempty"`
+	Password         string `json:"password,omitempty"`
 }
 
 func SendWebhook(data Webhook) {
