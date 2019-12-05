@@ -9,9 +9,10 @@ import (
 )
 
 type Webhook struct {
-	Step             string
-	Success          bool
-	ErrorExplanation string
+	Uuid             string `json:"uuid"`
+	Step             string `json:"step"`
+	Success          bool   `json:"success"`
+	ErrorExplanation string `json:"error_explanation"`
 }
 
 func SendWebhook(data Webhook) {
