@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"encoding/base64"
+	"gopkg.in/yaml.v2"
 	"os"
 	"strings"
 )
@@ -49,6 +50,11 @@ type Network struct {
 	}
 }
 
+type Metadata struct {
+	Network         string `json:"network"`
+	NetworkEncoding string `json:"network.encoding"`
+}
+
 func GenerateBaseTemplate(sshKey string) *Template {
 	template := Template{}
 
@@ -59,7 +65,7 @@ func GenerateBaseTemplate(sshKey string) *Template {
 		SshAuthorizedKeys: []string{sshKey},
 	}}
 
-	template.Chpasswd.Expire = false
+	template.Chpasswd.Expire = true
 
 	template.Growpart.Mode = "auto"
 	template.Growpart.Devices = []string{"/"}
@@ -68,15 +74,25 @@ func GenerateBaseTemplate(sshKey string) *Template {
 	return &template
 }
 
-func AddUbuntuSpecificParameters(template *Template, pass string, networkTemplate []byte) *Template {
+func AddSpecificParameters(specifier string, template *Template, pass string, networkTemplate *Network) (*Template, *Metadata) {
 	newTemplate := template
 
-	newTemplate.Users[0].Name = "ubuntu"
-	newTemplate.Chpasswd.List = []string{"ubuntu:" + pass, "root:" + pass}
+	newTemplate.Users[0].Name = specifier
+	newTemplate.Chpasswd.List = []string{specifier + ":" + pass}
 
-	newTemplate.WriteFiles = []WriteFile{{Encoding: "base64", Content: base64.StdEncoding.EncodeToString(networkTemplate), Path: "/etc/netplan/50-cloud-init.yaml"}}
-	newTemplate.Runcmd = []string{"netplan apply"}
-	return newTemplate
+	if specifier == "ubuntu" {
+		networkTemplate, _ := yaml.Marshal(networkTemplate)
+		newTemplate.WriteFiles = []WriteFile{{Encoding: "base64", Content: base64.StdEncoding.EncodeToString(networkTemplate), Path: "/etc/netplan/50-cloud-init.yaml"}}
+		newTemplate.Runcmd = []string{"netplan apply"}
+	} else if specifier == "centos" {
+		networkTemplate, _ := yaml.Marshal(networkTemplate.Network)
+		metadata := Metadata{
+			Network:         base64.StdEncoding.EncodeToString(networkTemplate),
+			NetworkEncoding: "base64",
+		}
+		return newTemplate, &metadata
+	}
+	return newTemplate, &Metadata{}
 }
 
 func CreateNetworkTemplate(identifier string, ipToAssign string) *Network {

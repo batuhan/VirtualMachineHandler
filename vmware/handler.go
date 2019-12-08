@@ -2,6 +2,7 @@ package vmware
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/sethvargo/go-password/password"
@@ -40,22 +41,17 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		return
 	}
 
-	networkTemplateObject := helpers.CreateNetworkTemplate(body.Identifier, body.IpToAssign)
-	networkTemplate, err := yaml.Marshal(networkTemplateObject)
-	if err != nil {
-		log.Println(err.Error())
-		helpers.SendWebhook(helpers.Webhook{
-			Uuid:             uuid.String(),
-			Step:             "templateGeneration",
-			Success:          false,
-			ErrorExplanation: "INTERNAL ERROR",
-		})
-		return
-	}
+	networkTemplate := helpers.CreateNetworkTemplate(body.Identifier, body.IpToAssign)
 
 	template := helpers.GenerateBaseTemplate(body.SshKey)
-	if strings.Contains(strings.ToLower(body.Template), "ubuntu") {
-		template = helpers.AddUbuntuSpecificParameters(template, pass, networkTemplate)
+	var metadata *helpers.Metadata
+	lowerTemplate := strings.ToLower(body.Template)
+	isUbuntu := strings.Contains(lowerTemplate, "ubuntu")
+	isCentos := strings.Contains(lowerTemplate, "centos")
+	if isUbuntu {
+		template, _ = helpers.AddSpecificParameters("ubuntu", template, pass, networkTemplate)
+	} else if isCentos {
+		template, metadata = helpers.AddSpecificParameters("centos", template, pass, networkTemplate)
 	}
 
 	userData, err := yaml.Marshal(template)
@@ -70,6 +66,21 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		return
 	}
 	userData = append([]byte("#cloud-config\n"), userData...)
+
+	var metadataString []byte
+	if isCentos {
+		metadataString, err = json.Marshal(metadata)
+		if err != nil {
+			log.Println(err.Error())
+			helpers.SendWebhook(helpers.Webhook{
+				Uuid:             uuid.String(),
+				Step:             "templateGeneration",
+				Success:          false,
+				ErrorExplanation: "INTERNAL ERROR",
+			})
+			return
+		}
+	}
 
 	helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
@@ -132,6 +143,22 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		Step:    "changeVMDiskSize",
 		Success: true,
 	})
+
+	if isCentos {
+		out, err = execute(body.Identifier, false, "vm.change", "-vm="+body.TargetName,
+			"-e=guestinfo.metadata=\""+base64.StdEncoding.EncodeToString(metadataString)+"\"", "-e=guestinfo.metadata.encoding=base64")
+		if err != nil {
+			log.Println(err.Error())
+			log.Println(string(out))
+			helpers.SendWebhook(helpers.Webhook{
+				Uuid:             uuid.String(),
+				Step:             "addCloudInitTemplate",
+				Success:          false,
+				ErrorExplanation: err.Error() + "\n" + string(out),
+			})
+			return
+		}
+	}
 
 	out, err = execute(body.Identifier, false, "vm.change", "-vm="+body.TargetName,
 		"-e=guestinfo.userdata=\""+base64.StdEncoding.EncodeToString(userData)+"\"", "-e=guestinfo.userdata.encoding=base64")
