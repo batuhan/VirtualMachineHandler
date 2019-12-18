@@ -66,3 +66,26 @@ pass identifier in the request body, like below
 `action` must be one of the following values: `on | off | suspend | shutdown | reboot`
 #### other
 template names must contain either `ubuntu` or `centos`, lower/upper case doesn't matter
+
+## while creating vmware templates
+
+the only user with login access should be `root`
+
+`cloud-init clean` should be run after every change to template
+
+### Ubuntu
+
+#### to install
+```
+apt install python3-pip
+curl -sSL https://raw.githubusercontent.com/vmware/cloud-init-vmware-guestinfo/master/install.sh | sh -
+cloud-init clean
+```
+### Centos
+
+#### to install
+```
+yum install python3
+curl -sSL https://raw.githubusercontent.com/vmware/cloud-init-vmware-guestinfo/master/install.sh | sh -
+```
+`cloud-init clean` after every change to template
