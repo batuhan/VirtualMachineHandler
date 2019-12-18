@@ -69,8 +69,11 @@ template names must contain either `ubuntu` or `centos`, lower/upper case doesn'
 
 ## while creating vmware templates
 
+the only user with login access should be `root`
+
+`cloud-init clean` should be run after every change to template
+
 ### Ubuntu
-default user must be `ubuntu`
 
 #### to install
 ```
@@ -78,9 +81,7 @@ apt install python3-pip
 curl -sSL https://raw.githubusercontent.com/vmware/cloud-init-vmware-guestinfo/master/install.sh | sh -
 cloud-init clean
 ```
-`cloud-init clean` after every change to template
 ### Centos
-default user must be `centos`
 
 #### to install
 ```

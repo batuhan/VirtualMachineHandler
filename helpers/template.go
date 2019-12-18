@@ -31,8 +31,10 @@ type Template struct {
 		Devices                []string
 		IgnoreGrowrootDisabled bool `yaml:"ignore_growroot_disabled"`
 	}
-	WriteFiles []WriteFile `yaml:"write_files"`
-	Runcmd     []string
+	WriteFiles  []WriteFile `yaml:"write_files"`
+	Runcmd      []string
+	SshPwauth   bool `yaml:"ssh_pwauth"`
+	DisableRoot bool `yaml:"disable_root"`
 }
 
 type Network struct {
@@ -73,6 +75,8 @@ func GenerateBaseTemplate(sshKey string) *Template {
 	template.Growpart.Mode = "auto"
 	template.Growpart.Devices = []string{"/"}
 	template.Growpart.IgnoreGrowrootDisabled = false
+	template.SshPwauth = true
+	template.DisableRoot = false
 
 	return &template
 }
@@ -80,13 +84,13 @@ func GenerateBaseTemplate(sshKey string) *Template {
 func AddSpecificParameters(specifier string, template *Template, pass string, networkTemplate *Network) (*Template, *Metadata) {
 	newTemplate := template
 
-	newTemplate.Users[0].Name = specifier
-	newTemplate.Chpasswd.List = []string{specifier + ":" + pass}
+	newTemplate.Users[0].Name = "root"
+	newTemplate.Chpasswd.List = []string{"root" + ":" + pass}
 
 	if specifier == "ubuntu" {
 		networkTemplate, _ := yaml.Marshal(networkTemplate)
 		newTemplate.WriteFiles = []WriteFile{{Encoding: "base64", Content: base64.StdEncoding.EncodeToString(networkTemplate), Path: "/etc/netplan/50-cloud-init.yaml"}}
-		newTemplate.Runcmd = []string{"netplan apply"}
+		newTemplate.Runcmd = []string{"echo \"PermitRootLogin yes\" >> /etc/ssh/sshd_config", "systemctl restart ssh", "netplan apply"}
 	} else if specifier == "centos" {
 		networkTemplate, _ := yaml.Marshal(networkTemplate.Network)
 		metadata := Metadata{
