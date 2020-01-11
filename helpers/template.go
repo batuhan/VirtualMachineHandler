@@ -89,7 +89,7 @@ func AddSpecificParameters(specifier string, template *Template, pass string, ne
 
 	if specifier == "ubuntu" {
 		networkTemplate, _ := yaml.Marshal(networkTemplate)
-		newTemplate.WriteFiles = []WriteFile{{Encoding: "base64", Content: base64.StdEncoding.EncodeToString(networkTemplate), Path: "/etc/netplan/50-cloud-init.yaml"}}
+		newTemplate.WriteFiles = []WriteFile{{Encoding: "base64", Content: base64.StdEncoding.EncodeToString(networkTemplate), Path: "/etc/netplan/01-netcfg.yaml"}}
 		newTemplate.Runcmd = []string{"echo \"PermitRootLogin yes\" >> /etc/ssh/sshd_config", "systemctl restart ssh", "netplan apply"}
 	} else if specifier == "centos" {
 		networkTemplate, _ := yaml.Marshal(networkTemplate.Network)
