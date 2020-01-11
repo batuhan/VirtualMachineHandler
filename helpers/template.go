@@ -13,9 +13,10 @@ type User struct {
 }
 
 type WriteFile struct {
-	Encoding string
-	Content  string
-	Path     string
+	Encoding    string
+	Content     string
+	Path        string
+	Permissions string
 }
 
 type Template struct {
@@ -73,7 +74,7 @@ func GenerateBaseTemplate(sshKey string) *Template {
 	template.Chpasswd.Expire = true
 
 	template.Growpart.Mode = "auto"
-	template.Growpart.Devices = []string{"/"}
+	template.Growpart.Devices = []string{"/dev/sda2", "/dev/sda5"}
 	template.Growpart.IgnoreGrowrootDisabled = false
 	template.SshPwauth = true
 	template.DisableRoot = false
@@ -89,7 +90,9 @@ func AddSpecificParameters(specifier string, template *Template, pass string, ne
 
 	if specifier == "ubuntu" {
 		networkTemplate, _ := yaml.Marshal(networkTemplate)
-		newTemplate.WriteFiles = []WriteFile{{Encoding: "base64", Content: base64.StdEncoding.EncodeToString(networkTemplate), Path: "/etc/netplan/01-netcfg.yaml"}}
+		newTemplate.WriteFiles = []WriteFile{
+			{Encoding: "base64", Content: base64.StdEncoding.EncodeToString(networkTemplate), Path: "/etc/netplan/01-netcfg.yaml"},
+			{Encoding: "base64", Content: base64.StdEncoding.EncodeToString([]byte("#!/bin/sh\npvresize /dev/sda5\nlvresize -l +100%FREE /dev/mapper/vg-root\nresize2fs /dev/mapper/vg-root\n")), Path: "/var/lib/cloud/scripts/per-boot/diskresize.sh", Permissions: "755"}}
 		newTemplate.Runcmd = []string{"echo \"PermitRootLogin yes\" >> /etc/ssh/sshd_config", "systemctl restart ssh", "netplan apply"}
 	} else if specifier == "centos" {
 		networkTemplate, _ := yaml.Marshal(networkTemplate.Network)
