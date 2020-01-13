@@ -96,6 +96,8 @@ func AddSpecificParameters(specifier string, template *Template, pass string, ne
 		newTemplate.Runcmd = []string{"echo \"PermitRootLogin yes\" >> /etc/ssh/sshd_config", "systemctl restart ssh", "netplan apply"}
 	} else if specifier == "centos" {
 		networkTemplate, _ := yaml.Marshal(networkTemplate.Network)
+		newTemplate.WriteFiles = []WriteFile{
+			{Encoding: "base64", Content: base64.StdEncoding.EncodeToString([]byte("#!/bin/sh\npvresize /dev/sda2\nlvresize -l +100%FREE --resizefs /dev/mapper/cl-root\n")), Path: "/var/lib/cloud/scripts/per-boot/diskresize.sh", Permissions: "755"}}
 		metadata := Metadata{
 			Network:         base64.StdEncoding.EncodeToString(networkTemplate),
 			NetworkEncoding: "base64",
