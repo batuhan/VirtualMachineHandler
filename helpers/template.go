@@ -42,7 +42,7 @@ type Network struct {
 	Network struct {
 		Version   int
 		Ethernets struct {
-			Ens192 struct {
+			Eth0 struct {
 				Match struct {
 					Name string
 				}
@@ -110,11 +110,11 @@ func AddSpecificParameters(specifier string, template *Template, pass string, ne
 func CreateNetworkTemplate(identifier string, ipToAssign string) *Network {
 	template := Network{}
 	template.Network.Version = 2
-	ens192 := template.Network.Ethernets.Ens192
-	ens192.Match.Name = "ens*"
-	ens192.Addresses = []string{ipToAssign + "/24"}
-	ens192.Gateway4 = os.Getenv(identifier + "_GATEWAY")
-	ens192.Nameservers.Addresses = strings.Split(os.Getenv(identifier+"_NAMESERVERS"), ",")
-	template.Network.Ethernets.Ens192 = ens192
+	eth0 := template.Network.Ethernets.Eth0
+	eth0.Match.Name = "ens*"
+	eth0.Addresses = []string{ipToAssign + "/24"}
+	eth0.Gateway4 = os.Getenv(identifier + "_GATEWAY")
+	eth0.Nameservers.Addresses = strings.Split(os.Getenv(identifier+"_NAMESERVERS"), ",")
+	template.Network.Ethernets.Eth0 = eth0
 	return &template
 }
