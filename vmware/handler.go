@@ -290,6 +290,7 @@ func Update(body helpers.Body, uuid uuid.UUID) {
 
 	if body.DiskSize != "" {
 		out, err := execute(body.Identifier, true, "vm.disk.change", "-vm="+body.TargetName, "-size="+body.DiskSize)
+		time.Sleep(5 * time.Second)
 		if err != nil {
 			log.Println(err.Error())
 			log.Println(string(out))
@@ -308,7 +309,6 @@ func Update(body helpers.Body, uuid uuid.UUID) {
 		})
 	}
 
-	time.Sleep(time.Second)
 	out, err = execute(body.Identifier, true, "vm.power", "-on=true", body.TargetName)
 	if err != nil {
 		log.Println(err.Error())
