@@ -94,10 +94,17 @@ func AddSpecificParameters(specifier string, template *Template, pass string, ne
 			{Encoding: "base64", Content: base64.StdEncoding.EncodeToString(networkTemplate), Path: "/etc/netplan/01-netcfg.yaml"},
 			{Encoding: "base64", Content: base64.StdEncoding.EncodeToString([]byte("#!/bin/sh\npvresize /dev/sda5\nlvresize -l +100%FREE /dev/mapper/vg-root\nresize2fs /dev/mapper/vg-root\n")), Path: "/var/lib/cloud/scripts/per-boot/diskresize.sh", Permissions: "755"}}
 		newTemplate.Runcmd = []string{"echo \"PermitRootLogin yes\" >> /etc/ssh/sshd_config", "systemctl restart ssh", "netplan apply"}
-	} else if specifier == "centos" {
-		networkTemplate, _ := yaml.Marshal(networkTemplate.Network)
+	} else if strings.Contains(specifier, "centos") {
+		var vgName string
+		if specifier == "centos-7" {
+			vgName = "centos"
+		} else if specifier == "centos-8" {
+			vgName = "cl"
+		}
 		newTemplate.WriteFiles = []WriteFile{
-			{Encoding: "base64", Content: base64.StdEncoding.EncodeToString([]byte("#!/bin/sh\npvresize /dev/sda2\nlvresize -l +100%FREE --resizefs /dev/mapper/cl-root\n")), Path: "/var/lib/cloud/scripts/per-boot/diskresize.sh", Permissions: "755"}}
+			{Encoding: "base64", Content: base64.StdEncoding.EncodeToString([]byte("#!/bin/sh\npvresize /dev/sda2\nlvresize -l +100%FREE --resizefs /dev/mapper/" + vgName + "-root\n")), Path: "/var/lib/cloud/scripts/per-boot/diskresize.sh", Permissions: "755"},
+		}
+		networkTemplate, _ := yaml.Marshal(networkTemplate.Network)
 		metadata := Metadata{
 			Network:         base64.StdEncoding.EncodeToString(networkTemplate),
 			NetworkEncoding: "base64",

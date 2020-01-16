@@ -65,7 +65,12 @@ pass identifier in the request body, like below
 ```
 `action` must be one of the following values: `on | off | suspend | shutdown | reboot`
 #### other
-template names must contain either `ubuntu` or `centos`, lower/upper case doesn't matter
+template names must contain one of the following values, lower/upper case doesn't matter
+```
+centos-7
+centos-8
+ubuntu
+```
 
 ## while creating vmware templates
 
