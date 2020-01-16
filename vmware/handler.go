@@ -13,6 +13,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func Env(w http.ResponseWriter, req *http.Request) {
@@ -307,6 +308,7 @@ func Update(body helpers.Body, uuid uuid.UUID) {
 		})
 	}
 
+	time.Sleep(time.Second)
 	out, err = execute(body.Identifier, true, "vm.power", "-on=true", body.TargetName)
 	if err != nil {
 		log.Println(err.Error())
