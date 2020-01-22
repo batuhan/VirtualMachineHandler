@@ -48,10 +48,13 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 	var metadata *helpers.Metadata
 	lowerTemplate := strings.ToLower(body.Template)
 	isUbuntu := strings.Contains(lowerTemplate, "ubuntu")
+	isDebian := strings.Contains(lowerTemplate, "debian")
 	isCentos7 := strings.Contains(lowerTemplate, "centos-7")
 	isCentos8 := strings.Contains(lowerTemplate, "centos-8")
 	if isUbuntu {
 		template, _ = helpers.AddSpecificParameters("ubuntu", template, pass, networkTemplate)
+	} else if isDebian {
+		template, metadata = helpers.AddSpecificParameters("debian", template, pass, networkTemplate)
 	} else if isCentos7 {
 		template, metadata = helpers.AddSpecificParameters("centos-7", template, pass, networkTemplate)
 	} else if isCentos8 {
@@ -72,7 +75,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 	userData = append([]byte("#cloud-config\n"), userData...)
 
 	var metadataString []byte
-	if isCentos7 || isCentos8 {
+	if isCentos7 || isCentos8 || isDebian {
 		metadataString, err = json.Marshal(metadata)
 		if err != nil {
 			log.Println(err.Error())
@@ -148,7 +151,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		Success: true,
 	})
 
-	if isCentos7 || isCentos8 {
+	if isCentos7 || isCentos8 || isDebian {
 		out, err = execute(body.Identifier, false, "vm.change", "-vm="+body.TargetName,
 			"-e=guestinfo.metadata=\""+base64.StdEncoding.EncodeToString(metadataString)+"\"", "-e=guestinfo.metadata.encoding=base64")
 		if err != nil {

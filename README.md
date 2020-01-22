@@ -70,6 +70,7 @@ template names must contain one of the following values, lower/upper case doesn'
 centos-7
 centos-8
 ubuntu
+debian
 ```
 
 ## while creating vmware templates

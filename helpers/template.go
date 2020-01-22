@@ -38,20 +38,23 @@ type Template struct {
 	DisableRoot bool `yaml:"disable_root"`
 }
 
+type Ethernet struct {
+	Match struct {
+		Name string
+	}
+	Addresses   []string
+	Gateway4    string
+	Nameservers struct {
+		Addresses []string
+	}
+}
+
 type Network struct {
 	Network struct {
 		Version   int
 		Ethernets struct {
-			Eth0 struct {
-				Match struct {
-					Name string
-				}
-				Addresses   []string
-				Gateway4    string
-				Nameservers struct {
-					Addresses []string
-				}
-			}
+			Eth0   Ethernet
+			Ens192 Ethernet
 		}
 	}
 }
@@ -64,8 +67,8 @@ type Metadata struct {
 func GenerateBaseTemplate(sshKey string) *Template {
 	template := Template{}
 
-	template.PackageUpdate = false
-	template.PackageUpgrade = false
+	template.PackageUpdate = true
+	template.PackageUpgrade = true
 
 	template.Users = []User{{
 		SshAuthorizedKeys: []string{sshKey},
@@ -94,15 +97,19 @@ func AddSpecificParameters(specifier string, template *Template, pass string, ne
 			{Encoding: "base64", Content: base64.StdEncoding.EncodeToString(networkTemplate), Path: "/etc/netplan/01-netcfg.yaml"},
 			{Encoding: "base64", Content: base64.StdEncoding.EncodeToString([]byte("#!/bin/sh\npvresize /dev/sda5\nlvresize -l +100%FREE /dev/mapper/vg-root\nresize2fs /dev/mapper/vg-root\n")), Path: "/var/lib/cloud/scripts/per-boot/diskresize.sh", Permissions: "755"}}
 		newTemplate.Runcmd = []string{"echo \"PermitRootLogin yes\" >> /etc/ssh/sshd_config", "systemctl restart ssh", "netplan apply"}
-	} else if strings.Contains(specifier, "centos") {
+	} else if strings.Contains(specifier, "centos") || specifier == "debian" {
 		var vgName string
 		if specifier == "centos-7" {
 			vgName = "centos"
 		} else if specifier == "centos-8" {
 			vgName = "cl"
+		} else if specifier == "debian" {
+			newTemplate.Runcmd = []string{"perl -pe 'BEGIN{undef $/;} s|iface ens.*||gs' /etc/network/interfaces > /etc/network/interfaces.new", "mv /etc/network/interfaces.new /etc/network/interfaces", "ip addr flush dev ens192", "service networking restart"}
+			vgName = "localhost--vg"
 		}
+
 		newTemplate.WriteFiles = []WriteFile{
-			{Encoding: "base64", Content: base64.StdEncoding.EncodeToString([]byte("#!/bin/sh\npvresize /dev/sda2\nlvresize -l +100%FREE --resizefs /dev/mapper/" + vgName + "-root\n")), Path: "/var/lib/cloud/scripts/per-boot/diskresize.sh", Permissions: "755"},
+			{Encoding: "base64", Content: base64.StdEncoding.EncodeToString([]byte("#!/bin/sh\npvresize /dev/sda2\npvresize /dev/sda5\nlvresize -l +100%FREE --resizefs /dev/mapper/" + vgName + "-root\n")), Path: "/var/lib/cloud/scripts/per-boot/diskresize.sh", Permissions: "755"},
 		}
 		networkTemplate, _ := yaml.Marshal(networkTemplate.Network)
 		metadata := Metadata{
@@ -123,5 +130,6 @@ func CreateNetworkTemplate(identifier string, ipToAssign string) *Network {
 	eth0.Gateway4 = os.Getenv(identifier + "_GATEWAY")
 	eth0.Nameservers.Addresses = strings.Split(os.Getenv(identifier+"_NAMESERVERS"), ",")
 	template.Network.Ethernets.Eth0 = eth0
+	template.Network.Ethernets.Ens192 = eth0
 	return &template
 }
