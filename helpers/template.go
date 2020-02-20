@@ -67,8 +67,8 @@ type Metadata struct {
 func GenerateBaseTemplate(sshKey string) *Template {
 	template := Template{}
 
-	template.PackageUpdate = true
-	template.PackageUpgrade = true
+	template.PackageUpdate = false
+	template.PackageUpgrade = false
 
 	template.Users = []User{{
 		SshAuthorizedKeys: []string{sshKey},
