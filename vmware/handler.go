@@ -33,7 +33,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 	pass, err := password.Generate(12, 2, 2, false, false)
 	if err != nil {
 		log.Println(err.Error())
-		helpers.SendWebhook(helpers.Webhook{
+		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "passwordGeneration",
 			Success:          false,
@@ -64,7 +64,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 	userData, err := yaml.Marshal(template)
 	if err != nil {
 		log.Println(err.Error())
-		helpers.SendWebhook(helpers.Webhook{
+		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "templateGeneration",
 			Success:          false,
@@ -79,7 +79,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		metadataString, err = json.Marshal(metadata)
 		if err != nil {
 			log.Println(err.Error())
-			helpers.SendWebhook(helpers.Webhook{
+			go helpers.SendWebhook(helpers.Webhook{
 				Uuid:             uuid.String(),
 				Step:             "templateGeneration",
 				Success:          false,
@@ -89,7 +89,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		}
 	}
 
-	helpers.SendWebhook(helpers.Webhook{
+	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "templateGeneration",
 		Success: true,
@@ -100,7 +100,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 	if err != nil {
 		log.Println(err.Error())
 		log.Println(string(out))
-		helpers.SendWebhook(helpers.Webhook{
+		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "createVM",
 			Success:          false,
@@ -108,7 +108,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		})
 		return
 	}
-	helpers.SendWebhook(helpers.Webhook{
+	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "createVM",
 		Success: true,
@@ -119,7 +119,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 	if err != nil {
 		log.Println(err.Error())
 		log.Println(string(out))
-		helpers.SendWebhook(helpers.Webhook{
+		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "moveVMToTargetDirectory",
 			Success:          false,
@@ -127,7 +127,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		})
 		return
 	}
-	helpers.SendWebhook(helpers.Webhook{
+	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "moveVMToTargetDirectory",
 		Success: true,
@@ -137,7 +137,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 	if err != nil {
 		log.Println(err.Error())
 		log.Println(string(out))
-		helpers.SendWebhook(helpers.Webhook{
+		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "changeVMDiskSize",
 			Success:          false,
@@ -145,7 +145,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		})
 		return
 	}
-	helpers.SendWebhook(helpers.Webhook{
+	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "changeVMDiskSize",
 		Success: true,
@@ -157,7 +157,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		if err != nil {
 			log.Println(err.Error())
 			log.Println(string(out))
-			helpers.SendWebhook(helpers.Webhook{
+			go helpers.SendWebhook(helpers.Webhook{
 				Uuid:             uuid.String(),
 				Step:             "addCloudInitTemplate",
 				Success:          false,
@@ -172,7 +172,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 	if err != nil {
 		log.Println(err.Error())
 		log.Println(string(out))
-		helpers.SendWebhook(helpers.Webhook{
+		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "addCloudInitTemplate",
 			Success:          false,
@@ -180,7 +180,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		})
 		return
 	}
-	helpers.SendWebhook(helpers.Webhook{
+	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "addCloudInitTemplate",
 		Success: true,
@@ -190,7 +190,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 	if err != nil {
 		log.Println(err.Error())
 		log.Println(string(out))
-		helpers.SendWebhook(helpers.Webhook{
+		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "powerOnVM",
 			Success:          false,
@@ -198,7 +198,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		})
 		return
 	}
-	helpers.SendWebhook(helpers.Webhook{
+	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:     uuid.String(),
 		Step:     "powerOnVM",
 		Success:  true,
@@ -211,7 +211,7 @@ func Delete(body helpers.Body, uuid uuid.UUID) error {
 	if err != nil {
 		log.Println(err.Error())
 		log.Println(string(out))
-		helpers.SendWebhook(helpers.Webhook{
+		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "deleteVM",
 			Success:          false,
@@ -219,7 +219,7 @@ func Delete(body helpers.Body, uuid uuid.UUID) error {
 		})
 		return err
 	}
-	helpers.SendWebhook(helpers.Webhook{
+	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "deleteVM",
 		Success: true,
@@ -241,14 +241,14 @@ func Update(body helpers.Body, uuid uuid.UUID) {
 		log.Println(err.Error())
 		log.Println(string(out))
 		// disable webhook since vm power off is a pre-condition and a already closed vm will throw an error
-		//helpers.SendWebhook(helpers.Webhook{
+		//go helpers.SendWebhook(helpers.Webhook{
 		//	Uuid:             uuid.String(),
 		//	Step:             "powerOffVM",
 		//	Success:          false,
 		//	ErrorExplanation: err.Error() + "\n" + string(out),
 		//})
 	}
-	helpers.SendWebhook(helpers.Webhook{
+	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "powerOffVM",
 		Success: true,
@@ -259,7 +259,7 @@ func Update(body helpers.Body, uuid uuid.UUID) {
 		if err != nil {
 			log.Println(err.Error())
 			log.Println(string(out))
-			helpers.SendWebhook(helpers.Webhook{
+			go helpers.SendWebhook(helpers.Webhook{
 				Uuid:             uuid.String(),
 				Step:             "updateCPU",
 				Success:          false,
@@ -267,7 +267,7 @@ func Update(body helpers.Body, uuid uuid.UUID) {
 			})
 			return
 		}
-		helpers.SendWebhook(helpers.Webhook{
+		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:    uuid.String(),
 			Step:    "updateCPU",
 			Success: true,
@@ -279,7 +279,7 @@ func Update(body helpers.Body, uuid uuid.UUID) {
 		if err != nil {
 			log.Println(err.Error())
 			log.Println(string(out))
-			helpers.SendWebhook(helpers.Webhook{
+			go helpers.SendWebhook(helpers.Webhook{
 				Uuid:             uuid.String(),
 				Step:             "updateMemory",
 				Success:          false,
@@ -287,7 +287,7 @@ func Update(body helpers.Body, uuid uuid.UUID) {
 			})
 			return
 		}
-		helpers.SendWebhook(helpers.Webhook{
+		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:    uuid.String(),
 			Step:    "updateMemory",
 			Success: true,
@@ -301,14 +301,14 @@ func Update(body helpers.Body, uuid uuid.UUID) {
 			log.Println(err.Error())
 			log.Println(string(out))
 			// disable error webhook for disk size since shrinking disk will always result in an error
-			//helpers.SendWebhook(helpers.Webhook{
+			//go helpers.SendWebhook(helpers.Webhook{
 			//	Uuid:             uuid.String(),
 			//	Step:             "updateDiskSize",
 			//	Success:          false,
 			//	ErrorExplanation: err.Error() + "\n" + string(out),
 			//})
 		}
-		helpers.SendWebhook(helpers.Webhook{
+		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:    uuid.String(),
 			Step:    "updateDiskSize",
 			Success: true,
@@ -319,7 +319,7 @@ func Update(body helpers.Body, uuid uuid.UUID) {
 	if err != nil {
 		log.Println(err.Error())
 		log.Println(string(out))
-		helpers.SendWebhook(helpers.Webhook{
+		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "powerOnVM",
 			Success:          false,
@@ -327,7 +327,7 @@ func Update(body helpers.Body, uuid uuid.UUID) {
 		})
 		return
 	}
-	helpers.SendWebhook(helpers.Webhook{
+	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "powerOnVM",
 		Success: true,
@@ -350,7 +350,7 @@ func State(body helpers.Body, uuid uuid.UUID) {
 	} else if body.Action == "reboot" {
 		nextState = "r"
 	} else {
-		helpers.SendWebhook(helpers.Webhook{
+		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "VMStateChange",
 			Success:          false,
@@ -363,7 +363,7 @@ func State(body helpers.Body, uuid uuid.UUID) {
 	if err != nil {
 		log.Println(err.Error())
 		log.Println(string(out))
-		helpers.SendWebhook(helpers.Webhook{
+		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "VMStateChange",
 			Success:          false,
@@ -371,7 +371,7 @@ func State(body helpers.Body, uuid uuid.UUID) {
 		})
 		return
 	}
-	helpers.SendWebhook(helpers.Webhook{
+	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "VMStateChange",
 		Success: true,
