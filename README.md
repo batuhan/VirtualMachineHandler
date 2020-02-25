@@ -14,6 +14,8 @@ IDENTIFIER_GATEWAY=xxx
 IDENTIFIER_NAMESERVERS=8.8.8.8,8.8.4.4
 
 WEBHOOK_URL=xxx
+WEBHOOK_AUTH_HEADER=xxx
+WEBHOOK_AUTH_TOKEN=xxx
 ```
 pass identifier in the request body, like below
 

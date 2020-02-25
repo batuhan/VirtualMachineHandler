@@ -23,7 +23,20 @@ func SendWebhook(data Webhook) {
 		return
 	}
 
-	_, err = http.Post(os.Getenv("WEBHOOK_URL"), "application/json", bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest("POST", os.Getenv("WEBHOOK_URL"), bytes.NewBuffer(requestBody))
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	authHeader := os.Getenv("WEBHOOK_AUTH_HEADER")
+	authToken := os.Getenv("WEBHOOK_AUTH_TOKEN")
+	if authToken != "" && authHeader != "" {
+		req.Header.Set(authHeader, authToken)
+	}
+
+	_, err = http.DefaultClient.Do(req)
 	if err != nil {
 		log.Println(err.Error())
 		return
