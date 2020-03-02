@@ -332,6 +332,11 @@ func Update(body helpers.Body, uuid uuid.UUID) {
 		Step:    "powerOnVM",
 		Success: true,
 	})
+	go helpers.SendWebhook(helpers.Webhook{
+		Uuid:    uuid.String(),
+		Step:    "updateFinished",
+		Success: true,
+	})
 }
 
 func State(body helpers.Body, uuid uuid.UUID) {
