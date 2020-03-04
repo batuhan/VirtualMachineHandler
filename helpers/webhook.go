@@ -14,6 +14,7 @@ type Webhook struct {
 	Success          bool   `json:"success"`
 	ErrorExplanation string `json:"errorExplanation,omitempty"`
 	Password         string `json:"password,omitempty"`
+	VCenterId        string `json:"vCenterId,omitempty"`
 }
 
 func SendWebhook(data Webhook) {
