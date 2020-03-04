@@ -64,7 +64,7 @@ type Metadata struct {
 	NetworkEncoding string `json:"network.encoding"`
 }
 
-func GenerateBaseTemplate(sshKey string) *Template {
+func GenerateBaseTemplate(sshKey string, onFirstBoot []string) *Template {
 	template := Template{}
 
 	template.PackageUpdate = false
@@ -73,6 +73,8 @@ func GenerateBaseTemplate(sshKey string) *Template {
 	template.Users = []User{{
 		SshAuthorizedKeys: []string{sshKey},
 	}}
+
+	template.Runcmd = onFirstBoot
 
 	template.Chpasswd.Expire = true
 
@@ -96,7 +98,7 @@ func AddSpecificParameters(specifier string, template *Template, pass string, ne
 		newTemplate.WriteFiles = []WriteFile{
 			{Encoding: "base64", Content: base64.StdEncoding.EncodeToString(networkTemplate), Path: "/etc/netplan/01-netcfg.yaml"},
 			{Encoding: "base64", Content: base64.StdEncoding.EncodeToString([]byte("#!/bin/sh\npvresize /dev/sda5\nlvresize -l +100%FREE /dev/mapper/vg-root\nresize2fs /dev/mapper/vg-root\n")), Path: "/var/lib/cloud/scripts/per-boot/diskresize.sh", Permissions: "755"}}
-		newTemplate.Runcmd = []string{"echo \"PermitRootLogin yes\" >> /etc/ssh/sshd_config", "systemctl restart ssh", "netplan apply"}
+		newTemplate.Runcmd = append(newTemplate.Runcmd, "echo \"PermitRootLogin yes\" >> /etc/ssh/sshd_config", "systemctl restart ssh", "netplan apply")
 	} else if strings.Contains(specifier, "centos") || specifier == "debian" {
 		var vgName string
 		if specifier == "centos-7" {
@@ -104,7 +106,7 @@ func AddSpecificParameters(specifier string, template *Template, pass string, ne
 		} else if specifier == "centos-8" {
 			vgName = "cl"
 		} else if specifier == "debian" {
-			newTemplate.Runcmd = []string{"perl -pe 'BEGIN{undef $/;} s|iface ens.*||gs' /etc/network/interfaces > /etc/network/interfaces.new", "mv /etc/network/interfaces.new /etc/network/interfaces", "ip addr flush dev ens192", "service networking restart"}
+			newTemplate.Runcmd = append(newTemplate.Runcmd, "perl -pe 'BEGIN{undef $/;} s|iface ens.*||gs' /etc/network/interfaces > /etc/network/interfaces.new", "mv /etc/network/interfaces.new /etc/network/interfaces", "ip addr flush dev ens192", "service networking restart")
 			vgName = "localhost--vg"
 		}
 

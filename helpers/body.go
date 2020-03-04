@@ -7,15 +7,16 @@ import (
 )
 
 type Body struct {
-	Identifier string
-	Template   string
-	TargetName string
-	Cpu        int
-	Memory     int
-	DiskSize   string
-	SshKey     string
-	IpToAssign string
-	Action     string
+	Identifier  string
+	Template    string
+	TargetName  string
+	Cpu         int
+	Memory      int
+	DiskSize    string
+	SshKey      string
+	IpToAssign  string
+	Action      string
+	OnFirstBoot []string
 }
 
 func GetBody(reqBody io.ReadCloser) Body {
