@@ -198,11 +198,28 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		})
 		return
 	}
+
+	// get vCenter ID
+	// /VirtualMachines/0/Self/Value
+	out, err = execute(body.Identifier, true, "vm.info", "-json", body.TargetName)
+	if err != nil {
+		log.Println(err.Error())
+		log.Println(string(out))
+		go helpers.SendWebhook(helpers.Webhook{
+			Uuid:             uuid.String(),
+			Step:             "powerOnVM",
+			Success:          false,
+			ErrorExplanation: err.Error() + "\n" + string(out),
+		})
+		return
+	}
+
 	go helpers.SendWebhook(helpers.Webhook{
-		Uuid:     uuid.String(),
-		Step:     "powerOnVM",
-		Success:  true,
-		Password: pass,
+		Uuid:      uuid.String(),
+		Step:      "powerOnVM",
+		Success:   true,
+		Password:  pass,
+		VCenterId: helpers.GetVCenterIdFromJSON(out),
 	})
 }
 
