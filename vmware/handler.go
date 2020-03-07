@@ -8,7 +8,6 @@ import (
 	"github.com/sethvargo/go-password/password"
 	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
 	"gopkg.in/yaml.v2"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -18,11 +17,12 @@ import (
 
 func Env(w http.ResponseWriter, req *http.Request) {
 	body := helpers.GetBody(req.Body)
+	logger := helpers.CreateLogger(body.Identifier)
 
-	out, err := execute(body.Identifier, true, "env")
+	out, err := execute(body.Identifier, true, logger, "env")
 	if err != nil {
-		log.Println(err.Error())
-		log.Println(string(out))
+		logger.Println(err.Error())
+		logger.Println(string(out))
 		return
 	}
 
@@ -30,15 +30,17 @@ func Env(w http.ResponseWriter, req *http.Request) {
 }
 
 func Create(body helpers.Create, uuid uuid.UUID) {
+	logger := helpers.CreateLogger(body.Identifier + " " + body.TargetName)
+
 	pass, err := password.Generate(12, 2, 2, false, false)
 	if err != nil {
-		log.Println(err.Error())
+		logger.Println(err.Error())
 		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "passwordGeneration",
 			Success:          false,
 			ErrorExplanation: "INTERNAL ERROR",
-		})
+		}, logger)
 		return
 	}
 
@@ -63,13 +65,13 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 
 	userData, err := yaml.Marshal(template)
 	if err != nil {
-		log.Println(err.Error())
+		logger.Println(err.Error())
 		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "templateGeneration",
 			Success:          false,
 			ErrorExplanation: "INTERNAL ERROR",
-		})
+		}, logger)
 		return
 	}
 	userData = append([]byte("#cloud-config\n"), userData...)
@@ -78,13 +80,13 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 	if isCentos7 || isCentos8 || isDebian {
 		metadataString, err = json.Marshal(metadata)
 		if err != nil {
-			log.Println(err.Error())
+			logger.Println(err.Error())
 			go helpers.SendWebhook(helpers.Webhook{
 				Uuid:             uuid.String(),
 				Step:             "templateGeneration",
 				Success:          false,
 				ErrorExplanation: "INTERNAL ERROR",
-			})
+			}, logger)
 			return
 		}
 	}
@@ -93,124 +95,124 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 		Uuid:    uuid.String(),
 		Step:    "templateGeneration",
 		Success: true,
-	})
+	}, logger)
 
-	out, err := execute(body.Identifier, true, "vm.clone", "-vm="+body.Template, "-on=false",
+	out, err := execute(body.Identifier, true, logger, "vm.clone", "-vm="+body.Template, "-on=false",
 		"-c="+strconv.Itoa(body.Cpu), "-m="+strconv.Itoa(body.Memory), body.TargetName)
 	if err != nil {
-		log.Println(err.Error())
-		log.Println(string(out))
+		logger.Println(err.Error())
+		logger.Println(string(out))
 		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "createVM",
 			Success:          false,
 			ErrorExplanation: err.Error() + "\n" + string(out),
-		})
+		}, logger)
 		return
 	}
 	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "createVM",
 		Success: true,
-	})
+	}, logger)
 
-	out, err = execute(body.Identifier, true, "object.mv", "./vm/"+body.TargetName,
+	out, err = execute(body.Identifier, true, logger, "object.mv", "./vm/"+body.TargetName,
 		os.Getenv(body.Identifier+"_TARGET_DIRECTORY"))
 	if err != nil {
-		log.Println(err.Error())
-		log.Println(string(out))
+		logger.Println(err.Error())
+		logger.Println(string(out))
 		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "moveVMToTargetDirectory",
 			Success:          false,
 			ErrorExplanation: err.Error() + "\n" + string(out),
-		})
+		}, logger)
 		return
 	}
 	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "moveVMToTargetDirectory",
 		Success: true,
-	})
+	}, logger)
 
-	out, err = execute(body.Identifier, true, "vm.disk.change", "-vm="+body.TargetName, "-size="+body.DiskSize)
+	out, err = execute(body.Identifier, true, logger, "vm.disk.change", "-vm="+body.TargetName, "-size="+body.DiskSize)
 	if err != nil {
-		log.Println(err.Error())
-		log.Println(string(out))
+		logger.Println(err.Error())
+		logger.Println(string(out))
 		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "changeVMDiskSize",
 			Success:          false,
 			ErrorExplanation: err.Error() + "\n" + string(out),
-		})
+		}, logger)
 		return
 	}
 	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "changeVMDiskSize",
 		Success: true,
-	})
+	}, logger)
 
 	if isCentos7 || isCentos8 || isDebian {
-		out, err = execute(body.Identifier, false, "vm.change", "-vm="+body.TargetName,
+		out, err = execute(body.Identifier, true, logger, "vm.change", "-vm="+body.TargetName,
 			"-e=guestinfo.metadata=\""+base64.StdEncoding.EncodeToString(metadataString)+"\"", "-e=guestinfo.metadata.encoding=base64")
 		if err != nil {
-			log.Println(err.Error())
-			log.Println(string(out))
+			logger.Println(err.Error())
+			logger.Println(string(out))
 			go helpers.SendWebhook(helpers.Webhook{
 				Uuid:             uuid.String(),
 				Step:             "addCloudInitTemplate",
 				Success:          false,
 				ErrorExplanation: err.Error() + "\n" + string(out),
-			})
+			}, logger)
 			return
 		}
 	}
 
-	out, err = execute(body.Identifier, false, "vm.change", "-vm="+body.TargetName,
+	out, err = execute(body.Identifier, true, logger, "vm.change", "-vm="+body.TargetName,
 		"-e=guestinfo.userdata=\""+base64.StdEncoding.EncodeToString(userData)+"\"", "-e=guestinfo.userdata.encoding=base64")
 	if err != nil {
-		log.Println(err.Error())
-		log.Println(string(out))
+		logger.Println(err.Error())
+		logger.Println(string(out))
 		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "addCloudInitTemplate",
 			Success:          false,
 			ErrorExplanation: err.Error() + "\n" + string(out),
-		})
+		}, logger)
 		return
 	}
 	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "addCloudInitTemplate",
 		Success: true,
-	})
+	}, logger)
 
-	out, err = execute(body.Identifier, true, "vm.power", "-on=true", body.TargetName)
+	out, err = execute(body.Identifier, true, logger, "vm.power", "-on=true", body.TargetName)
 	if err != nil {
-		log.Println(err.Error())
-		log.Println(string(out))
+		logger.Println(err.Error())
+		logger.Println(string(out))
 		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "powerOnVM",
 			Success:          false,
 			ErrorExplanation: err.Error() + "\n" + string(out),
-		})
+		}, logger)
 		return
 	}
 
 	// get vCenter ID
 	// /VirtualMachines/0/Self/Value
-	out, err = execute(body.Identifier, true, "vm.info", "-json", body.TargetName)
+	out, err = execute(body.Identifier, true, logger, "vm.info", "-json", body.TargetName)
 	if err != nil {
-		log.Println(err.Error())
-		log.Println(string(out))
+		logger.Println(err.Error())
+		logger.Println(string(out))
 		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "powerOnVM",
 			Success:          false,
 			ErrorExplanation: err.Error() + "\n" + string(out),
-		})
+		}, logger)
 		return
 	}
 
@@ -219,28 +221,30 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 		Step:      "powerOnVM",
 		Success:   true,
 		Password:  pass,
-		VCenterId: helpers.GetVCenterIdFromJSON(out),
-	})
+		VCenterId: helpers.GetVCenterIdFromJSON(out, logger),
+	}, logger)
 }
 
 func Delete(identifier string, targetName string, uuid uuid.UUID) error {
-	out, err := execute(identifier, true, "vm.destroy", targetName)
+	logger := helpers.CreateLogger(identifier + " " + targetName)
+
+	out, err := execute(identifier, true, logger, "vm.destroy", targetName)
 	if err != nil {
-		log.Println(err.Error())
-		log.Println(string(out))
+		logger.Println(err.Error())
+		logger.Println(string(out))
 		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "deleteVM",
 			Success:          false,
 			ErrorExplanation: err.Error() + "\n" + string(out),
-		})
+		}, logger)
 		return err
 	}
 	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "deleteVM",
 		Success: true,
-	})
+	}, logger)
 	return nil
 }
 
@@ -253,10 +257,12 @@ func Recreate(body helpers.Create, uuid uuid.UUID) {
 }
 
 func Update(body helpers.Update, uuid uuid.UUID) {
-	out, err := execute(body.Identifier, true, "vm.power", "-s=true", body.TargetName)
+	logger := helpers.CreateLogger(body.Identifier + " " + body.TargetName)
+
+	out, err := execute(body.Identifier, true, logger, "vm.power", "-s=true", body.TargetName)
 	if err != nil {
-		log.Println(err.Error())
-		log.Println(string(out))
+		logger.Println(err.Error())
+		logger.Println(string(out))
 		// disable webhook since vm power off is a pre-condition and a already closed vm will throw an error
 		//go helpers.SendWebhook(helpers.Webhook{
 		//	Uuid:             uuid.String(),
@@ -269,54 +275,54 @@ func Update(body helpers.Update, uuid uuid.UUID) {
 		Uuid:    uuid.String(),
 		Step:    "powerOffVM",
 		Success: true,
-	})
+	}, logger)
 
 	if body.Cpu != 0 {
-		out, err := execute(body.Identifier, true, "vm.change", "-vm="+body.TargetName, "-c="+strconv.Itoa(body.Cpu))
+		out, err := execute(body.Identifier, true, logger, "vm.change", "-vm="+body.TargetName, "-c="+strconv.Itoa(body.Cpu))
 		if err != nil {
-			log.Println(err.Error())
-			log.Println(string(out))
+			logger.Println(err.Error())
+			logger.Println(string(out))
 			go helpers.SendWebhook(helpers.Webhook{
 				Uuid:             uuid.String(),
 				Step:             "updateCPU",
 				Success:          false,
 				ErrorExplanation: err.Error() + "\n" + string(out),
-			})
+			}, logger)
 			return
 		}
 		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:    uuid.String(),
 			Step:    "updateCPU",
 			Success: true,
-		})
+		}, logger)
 	}
 
 	if body.Memory != 0 {
-		out, err := execute(body.Identifier, true, "vm.change", "-vm="+body.TargetName, "-m="+strconv.Itoa(body.Memory))
+		out, err := execute(body.Identifier, true, logger, "vm.change", "-vm="+body.TargetName, "-m="+strconv.Itoa(body.Memory))
 		if err != nil {
-			log.Println(err.Error())
-			log.Println(string(out))
+			logger.Println(err.Error())
+			logger.Println(string(out))
 			go helpers.SendWebhook(helpers.Webhook{
 				Uuid:             uuid.String(),
 				Step:             "updateMemory",
 				Success:          false,
 				ErrorExplanation: err.Error() + "\n" + string(out),
-			})
+			}, logger)
 			return
 		}
 		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:    uuid.String(),
 			Step:    "updateMemory",
 			Success: true,
-		})
+		}, logger)
 	}
 
 	if body.DiskSize != "" {
-		out, err := execute(body.Identifier, true, "vm.disk.change", "-vm="+body.TargetName, "-size="+body.DiskSize)
+		out, err := execute(body.Identifier, true, logger, "vm.disk.change", "-vm="+body.TargetName, "-size="+body.DiskSize)
 		time.Sleep(5 * time.Second)
 		if err != nil {
-			log.Println(err.Error())
-			log.Println(string(out))
+			logger.Println(err.Error())
+			logger.Println(string(out))
 			// disable error webhook for disk size since shrinking disk will always result in an error
 			//go helpers.SendWebhook(helpers.Webhook{
 			//	Uuid:             uuid.String(),
@@ -329,34 +335,36 @@ func Update(body helpers.Update, uuid uuid.UUID) {
 			Uuid:    uuid.String(),
 			Step:    "updateDiskSize",
 			Success: true,
-		})
+		}, logger)
 	}
 
-	out, err = execute(body.Identifier, true, "vm.power", "-on=true", body.TargetName)
+	out, err = execute(body.Identifier, true, logger, "vm.power", "-on=true", body.TargetName)
 	if err != nil {
-		log.Println(err.Error())
-		log.Println(string(out))
+		logger.Println(err.Error())
+		logger.Println(string(out))
 		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "powerOnVM",
 			Success:          false,
 			ErrorExplanation: err.Error() + "\n" + string(out),
-		})
+		}, logger)
 		return
 	}
 	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "powerOnVM",
 		Success: true,
-	})
+	}, logger)
 	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "updateFinished",
 		Success: true,
-	})
+	}, logger)
 }
 
 func State(body helpers.State, uuid uuid.UUID) {
+	logger := helpers.CreateLogger(body.Identifier + " " + body.TargetName)
+
 	nextState := ""
 
 	if body.Action == "on" {
@@ -377,25 +385,25 @@ func State(body helpers.State, uuid uuid.UUID) {
 			Step:             "VMStateChange",
 			Success:          false,
 			ErrorExplanation: "need valid action value",
-		})
+		}, logger)
 		return
 	}
 
-	out, err := execute(body.Identifier, true, "vm.power", "-"+nextState+"=true", body.TargetName)
+	out, err := execute(body.Identifier, true, logger, "vm.power", "-"+nextState+"=true", body.TargetName)
 	if err != nil {
-		log.Println(err.Error())
-		log.Println(string(out))
+		logger.Println(err.Error())
+		logger.Println(string(out))
 		go helpers.SendWebhook(helpers.Webhook{
 			Uuid:             uuid.String(),
 			Step:             "VMStateChange",
 			Success:          false,
 			ErrorExplanation: err.Error() + "\n" + string(out),
-		})
+		}, logger)
 		return
 	}
 	go helpers.SendWebhook(helpers.Webhook{
 		Uuid:    uuid.String(),
 		Step:    "VMStateChange",
 		Success: true,
-	})
+	}, logger)
 }
