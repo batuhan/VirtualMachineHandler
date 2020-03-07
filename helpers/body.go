@@ -7,15 +7,34 @@ import (
 )
 
 type Body struct {
-	Identifier  string
+	Identifier string
+	TargetName string
+}
+
+type Delete struct {
+	Body
+}
+
+type Update struct {
+	Body
+	Cpu      int
+	Memory   int
+	DiskSize string
+}
+
+type State struct {
+	Body
+	Action string
+}
+
+type Create struct {
+	Body
 	Template    string
-	TargetName  string
 	Cpu         int
 	Memory      int
 	DiskSize    string
 	SshKey      string
 	IpToAssign  string
-	Action      string
 	OnFirstBoot []string
 }
 
