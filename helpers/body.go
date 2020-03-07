@@ -8,31 +8,28 @@ import (
 
 type Body struct {
 	Identifier string
+	TargetName string
 }
 
 type Delete struct {
 	Body
-	TargetName string
 }
 
 type Update struct {
 	Body
-	TargetName string
-	Cpu        int
-	Memory     int
-	DiskSize   string
+	Cpu      int
+	Memory   int
+	DiskSize string
 }
 
 type State struct {
 	Body
-	TargetName string
-	Action     string
+	Action string
 }
 
 type Create struct {
 	Body
 	Template    string
-	TargetName  string
 	Cpu         int
 	Memory      int
 	DiskSize    string
