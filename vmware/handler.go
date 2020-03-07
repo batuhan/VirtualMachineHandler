@@ -29,7 +29,7 @@ func Env(w http.ResponseWriter, req *http.Request) {
 	_, _ = fmt.Fprintf(w, string(out))
 }
 
-func Create(body helpers.Body, uuid uuid.UUID) {
+func Create(body helpers.Create, uuid uuid.UUID) {
 	pass, err := password.Generate(12, 2, 2, false, false)
 	if err != nil {
 		log.Println(err.Error())
@@ -223,8 +223,8 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 	})
 }
 
-func Delete(body helpers.Body, uuid uuid.UUID) error {
-	out, err := execute(body.Identifier, true, "vm.destroy", body.TargetName)
+func Delete(identifier string, targetName string, uuid uuid.UUID) error {
+	out, err := execute(identifier, true, "vm.destroy", targetName)
 	if err != nil {
 		log.Println(err.Error())
 		log.Println(string(out))
@@ -244,15 +244,15 @@ func Delete(body helpers.Body, uuid uuid.UUID) error {
 	return nil
 }
 
-func Recreate(body helpers.Body, uuid uuid.UUID) {
-	err := Delete(body, uuid)
+func Recreate(body helpers.Create, uuid uuid.UUID) {
+	err := Delete(body.Identifier, body.TargetName, uuid)
 	if err != nil {
 		return
 	}
 	Create(body, uuid)
 }
 
-func Update(body helpers.Body, uuid uuid.UUID) {
+func Update(body helpers.Update, uuid uuid.UUID) {
 	out, err := execute(body.Identifier, true, "vm.power", "-s=true", body.TargetName)
 	if err != nil {
 		log.Println(err.Error())
@@ -356,7 +356,7 @@ func Update(body helpers.Body, uuid uuid.UUID) {
 	})
 }
 
-func State(body helpers.Body, uuid uuid.UUID) {
+func State(body helpers.State, uuid uuid.UUID) {
 	nextState := ""
 
 	if body.Action == "on" {
