@@ -13,11 +13,11 @@ type VmInfoDump struct {
 	}
 }
 
-func GetVCenterIdFromJSON(output []byte) string {
+func GetVCenterIdFromJSON(output []byte, logger *log.Logger) string {
 	var dump VmInfoDump
 	err := json.Unmarshal(output, &dump)
 	if err != nil {
-		log.Println(err.Error())
+		logger.Println(err.Error())
 	}
 	return dump.VirtualMachines[0].Self.Value
 }

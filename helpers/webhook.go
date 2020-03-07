@@ -17,17 +17,17 @@ type Webhook struct {
 	VCenterId        string `json:"vCenterId,omitempty"`
 }
 
-func SendWebhook(data Webhook) {
+func SendWebhook(data Webhook, logger *log.Logger) {
 	requestBody, err := json.Marshal(data)
 	if err != nil {
-		log.Println(err.Error())
+		logger.Println(err.Error())
 		return
 	}
-	log.Println(string(requestBody))
+	logger.Println(string(requestBody))
 
 	req, err := http.NewRequest("POST", os.Getenv("WEBHOOK_URL"), bytes.NewBuffer(requestBody))
 	if err != nil {
-		log.Println(err.Error())
+		logger.Println(err.Error())
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
@@ -40,7 +40,7 @@ func SendWebhook(data Webhook) {
 
 	_, err = http.DefaultClient.Do(req)
 	if err != nil {
-		log.Println(err.Error())
+		logger.Println(err.Error())
 		return
 	}
 }
