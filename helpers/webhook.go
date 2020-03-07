@@ -23,6 +23,7 @@ func SendWebhook(data Webhook) {
 		log.Println(err.Error())
 		return
 	}
+	log.Println(string(requestBody))
 
 	req, err := http.NewRequest("POST", os.Getenv("WEBHOOK_URL"), bytes.NewBuffer(requestBody))
 	if err != nil {

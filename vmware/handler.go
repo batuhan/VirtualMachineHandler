@@ -152,7 +152,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 	})
 
 	if isCentos7 || isCentos8 || isDebian {
-		out, err = execute(body.Identifier, false, "vm.change", "-vm="+body.TargetName,
+		out, err = execute(body.Identifier, true, "vm.change", "-vm="+body.TargetName,
 			"-e=guestinfo.metadata=\""+base64.StdEncoding.EncodeToString(metadataString)+"\"", "-e=guestinfo.metadata.encoding=base64")
 		if err != nil {
 			log.Println(err.Error())
@@ -167,7 +167,7 @@ func Create(body helpers.Body, uuid uuid.UUID) {
 		}
 	}
 
-	out, err = execute(body.Identifier, false, "vm.change", "-vm="+body.TargetName,
+	out, err = execute(body.Identifier, true, "vm.change", "-vm="+body.TargetName,
 		"-e=guestinfo.userdata=\""+base64.StdEncoding.EncodeToString(userData)+"\"", "-e=guestinfo.userdata.encoding=base64")
 	if err != nil {
 		log.Println(err.Error())
