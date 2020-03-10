@@ -54,7 +54,7 @@ func main() {
 		}
 		go actions.Update(body, uuid)
 	})
-	http.HandleFunc("/state", func(w http.ResponseWriter, req *http.Request) {
+	http.HandleFunc("/changeState", func(w http.ResponseWriter, req *http.Request) {
 		uuid := helpers.GenerateUUID()
 		_, _ = fmt.Fprint(w, uuid)
 		body := helpers.State{}
@@ -62,7 +62,7 @@ func main() {
 		if err != nil {
 			log.Println(err.Error())
 		}
-		go actions.State(body, uuid)
+		go actions.ChangeState(body, uuid)
 	})
 
 	http.HandleFunc("/dump", func(w http.ResponseWriter, req *http.Request) {
