@@ -5,19 +5,24 @@ import (
 	"log"
 )
 
-type VmInfoDump struct {
+type VMInfoDump struct {
 	VirtualMachines []struct {
+		Summary struct {
+			Runtime struct {
+				PowerState string
+			}
+		}
 		Self struct {
 			Value string
 		}
 	}
 }
 
-func GetVCenterIdFromJSON(output []byte, logger *log.Logger) string {
-	var dump VmInfoDump
+func ParseVMInfoDump(output []byte, logger *log.Logger) VMInfoDump {
+	var dump VMInfoDump
 	err := json.Unmarshal(output, &dump)
 	if err != nil {
 		logger.Println(err.Error())
 	}
-	return dump.VirtualMachines[0].Self.Value
+	return dump
 }

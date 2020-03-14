@@ -6,7 +6,7 @@ import (
 	"os/exec"
 )
 
-func execute(baseEnv string, doLog bool, logger *log.Logger, arg ...string) ([]byte, error) {
+func Execute(baseEnv string, doLog bool, logger *log.Logger, arg ...string) ([]byte, error) {
 	cmd := exec.Command("govc", arg...)
 	if doLog {
 		logger.Println(cmd.Args)
@@ -21,5 +21,10 @@ func execute(baseEnv string, doLog bool, logger *log.Logger, arg ...string) ([]b
 		"GOVC_RESOURCE_POOL=" + os.Getenv(baseEnv+"_GOVC_RESOURCE_POOL"),
 	}
 	out, err := cmd.CombinedOutput()
+	return out, err
+}
+
+func GetVMInfoDump(identifier string, targetName string, logger *log.Logger) ([]byte, error) {
+	out, err := Execute(identifier, true, logger, "vm.info", "-json", targetName)
 	return out, err
 }

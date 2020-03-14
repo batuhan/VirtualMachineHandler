@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
-	"gitlab.com/nod/bigcore/VirtualMachineHandler/vmware"
+	"gitlab.com/nod/bigcore/VirtualMachineHandler/vmware/actions"
 	"log"
 	"net/http"
 	"net/http/httputil"
 )
 
 func main() {
-	http.HandleFunc("/env", vmware.Env)
+	http.HandleFunc("/env", actions.Env)
 	http.HandleFunc("/create", func(w http.ResponseWriter, req *http.Request) {
 		uuid := helpers.GenerateUUID()
 		_, _ = fmt.Fprint(w, uuid)
@@ -20,7 +20,7 @@ func main() {
 		if err != nil {
 			log.Println(err.Error())
 		}
-		go vmware.Create(body, uuid)
+		go actions.Create(body, uuid)
 	})
 	http.HandleFunc("/delete", func(w http.ResponseWriter, req *http.Request) {
 		uuid := helpers.GenerateUUID()
@@ -31,7 +31,7 @@ func main() {
 			log.Println(err.Error())
 		}
 		go func() {
-			_ = vmware.Delete(body.Identifier, body.TargetName, uuid)
+			_ = actions.Delete(body.Identifier, body.TargetName, uuid)
 		}()
 	})
 	http.HandleFunc("/recreate", func(w http.ResponseWriter, req *http.Request) {
@@ -42,7 +42,7 @@ func main() {
 		if err != nil {
 			log.Println(err.Error())
 		}
-		go vmware.Recreate(body, uuid)
+		go actions.Recreate(body, uuid)
 	})
 	http.HandleFunc("/update", func(w http.ResponseWriter, req *http.Request) {
 		uuid := helpers.GenerateUUID()
@@ -52,7 +52,7 @@ func main() {
 		if err != nil {
 			log.Println(err.Error())
 		}
-		go vmware.Update(body, uuid)
+		go actions.Update(body, uuid)
 	})
 	http.HandleFunc("/state", func(w http.ResponseWriter, req *http.Request) {
 		uuid := helpers.GenerateUUID()
@@ -62,7 +62,7 @@ func main() {
 		if err != nil {
 			log.Println(err.Error())
 		}
-		go vmware.State(body, uuid)
+		go actions.State(body, uuid)
 	})
 
 	http.HandleFunc("/dump", func(w http.ResponseWriter, req *http.Request) {
