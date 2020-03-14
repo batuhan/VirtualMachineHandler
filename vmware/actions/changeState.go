@@ -6,7 +6,7 @@ import (
 	"gitlab.com/nod/bigcore/VirtualMachineHandler/vmware"
 )
 
-func State(body helpers.State, uuid uuid.UUID) {
+func ChangeState(body helpers.State, uuid uuid.UUID) {
 	logger := helpers.CreateLogger(body.Identifier + " " + body.TargetName)
 
 	nextState := ""
