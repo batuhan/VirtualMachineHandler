@@ -4,7 +4,7 @@ stages:
   - publishImageConfig:
       dockerfilePath: ./Dockerfile
       buildContext: .
-      tag: bg/vmh:0001
-      registry: 127.0.0.1:34728
+      tag: bigcore/vmh:0001
+      registry: registry.bigcore.net
 timeout: 60
 notification: {}
