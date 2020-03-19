@@ -1,10 +1,10 @@
 stages:
-- name: build
-  steps:
-  - publishImageConfig:
-      dockerfilePath: ./Dockerfile
-      buildContext: .
-      tag: bigcore/vmh:0001
-      registry: registry.bigcore.net
+  - name: build
+    steps:
+    - publishImageConfig:
+        dockerfilePath: ./Dockerfile
+        buildContext: .
+        tag: bigcore/vmh:0001
+        registry: registry.bigcore.net
 timeout: 60
 notification: {}
