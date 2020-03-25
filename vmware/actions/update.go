@@ -30,7 +30,7 @@ func GetPowerState(body helpers.Update, logger *log.Logger, uuid uuid.UUID) *str
 func Update(body helpers.Update, uuid uuid.UUID) {
 	logger := helpers.CreateLogger(body.Identifier + " " + body.TargetName)
 
-	out, err := vmware.Execute(body.Identifier, true, logger, "vm.power", "-on=true", body.TargetName)
+	out, err := vmware.Execute(body.Identifier, true, logger, "vm.power", "-off=true", body.TargetName)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
