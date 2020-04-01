@@ -14,3 +14,7 @@ func CompileRegexes() {
 	}
 	CreateNameRegex = createNameRegex
 }
+
+func ApplyCreateNameRegex(base string) string {
+	return CreateNameRegex.ReplaceAllString(base, "")
+}

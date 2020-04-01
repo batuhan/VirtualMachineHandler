@@ -18,7 +18,7 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 
 	currentDate := time.Now().UTC().Format(time.RFC3339)
 	vmName := currentDate + "_" + body.TargetName
-	vmName = helpers.CreateNameRegex.ReplaceAllString(vmName, "")
+	vmName = helpers.ApplyCreateNameRegex(vmName)
 
 	pass, err := password.Generate(12, 2, 2, false, false)
 	if err != nil {
