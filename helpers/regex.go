@@ -5,16 +5,16 @@ import (
 	"regexp"
 )
 
-var CreateNameRegex *regexp.Regexp
+var TargetNameRegex *regexp.Regexp
 
 func CompileRegexes() {
 	createNameRegex, err := regexp.Compile(`\W|\s`)
 	if err != nil {
 		log.Fatal(err)
 	}
-	CreateNameRegex = createNameRegex
+	TargetNameRegex = createNameRegex
 }
 
-func ApplyCreateNameRegex(base string) string {
-	return CreateNameRegex.ReplaceAllString(base, "")
+func ApplyTargetNameRegex(base string) string {
+	return TargetNameRegex.ReplaceAllString(base, "")
 }
