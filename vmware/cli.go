@@ -3,7 +3,6 @@ package vmware
 import (
 	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
 	"log"
-	"os"
 	"os/exec"
 )
 
@@ -14,12 +13,12 @@ func Execute(baseEnv string, doLog bool, logger *log.Logger, arg ...string) ([]b
 	}
 	cmd.Env = []string{
 		"GOVC_INSECURE=" + helpers.Config.GovcInsecure,
-		"GOVC_URL=" + os.Getenv(baseEnv+"_GOVC_URL"),
-		"GOVC_USERNAME=" + os.Getenv(baseEnv+"_GOVC_USERNAME"),
-		"GOVC_PASSWORD=" + os.Getenv(baseEnv+"_GOVC_PASSWORD"),
-		"GOVC_DATACENTER=" + os.Getenv(baseEnv+"_GOVC_DATACENTER"),
-		"GOVC_DATASTORE=" + os.Getenv(baseEnv+"_GOVC_DATASTORE"),
-		"GOVC_RESOURCE_POOL=" + os.Getenv(baseEnv+"_GOVC_RESOURCE_POOL"),
+		"GOVC_URL=" + helpers.Config.DynamicConfigs[baseEnv].GovcURL,
+		"GOVC_USERNAME=" + helpers.Config.DynamicConfigs[baseEnv].GovcUsername,
+		"GOVC_PASSWORD=" + helpers.Config.DynamicConfigs[baseEnv].GovcPassword,
+		"GOVC_DATACENTER=" + helpers.Config.DynamicConfigs[baseEnv].GovcDatacenter,
+		"GOVC_DATASTORE=" + helpers.Config.DynamicConfigs[baseEnv].GovcDatastore,
+		"GOVC_RESOURCE_POOL=" + helpers.Config.DynamicConfigs[baseEnv].GovcResourcePool,
 	}
 	out, err := cmd.CombinedOutput()
 	return out, err

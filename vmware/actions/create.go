@@ -8,7 +8,6 @@ import (
 	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
 	"gitlab.com/nod/bigcore/VirtualMachineHandler/vmware"
 	"gopkg.in/yaml.v2"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -101,7 +100,7 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 	}, logger)
 
 	out, err = vmware.Execute(body.Identifier, true, logger, "object.mv", "./vm/"+body.TargetName,
-		os.Getenv(body.Identifier+"_TARGET_DIRECTORY"))
+		helpers.Config.DynamicConfigs[body.Identifier].TargetDirectory)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
