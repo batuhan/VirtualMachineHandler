@@ -9,6 +9,12 @@ import (
 func ChangeState(body helpers.State, uuid uuid.UUID) {
 	logger := helpers.CreateLogger(body.Identifier + " " + body.TargetName)
 
+	baseVMName := helpers.ApplyTargetNameRegex(body.TargetName)
+	vmName, err := vmware.FindVM(body.Identifier, logger, baseVMName, uuid)
+	if err != nil {
+		return
+	}
+
 	nextState := ""
 
 	if body.Action == "on" {
@@ -33,7 +39,7 @@ func ChangeState(body helpers.State, uuid uuid.UUID) {
 		return
 	}
 
-	out, err := vmware.Execute(body.Identifier, true, logger, "vm.power", "-"+nextState+"=true", body.TargetName)
+	out, err := vmware.Execute(body.Identifier, true, logger, "vm.power", "-"+nextState+"=true", vmName)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
