@@ -8,7 +8,7 @@ import (
 var CreateNameRegex *regexp.Regexp
 
 func CompileRegexes() {
-	var createNameRegex, err = regexp.Compile(`\W|\s`)
+	createNameRegex, err := regexp.Compile(`\W|\s`)
 	if err != nil {
 		log.Fatal(err)
 	}
