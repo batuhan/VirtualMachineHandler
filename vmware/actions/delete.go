@@ -9,7 +9,13 @@ import (
 func Delete(identifier string, targetName string, uuid uuid.UUID) error {
 	logger := helpers.CreateLogger(identifier + " " + targetName)
 
-	out, err := vmware.Execute(identifier, true, logger, "vm.destroy", targetName)
+	baseVMName := helpers.ApplyTargetNameRegex(targetName)
+	vmName, err := vmware.FindVM(identifier, logger, baseVMName, uuid)
+	if err != nil {
+		return err
+	}
+
+	out, err := vmware.Execute(identifier, true, logger, "vm.destroy", vmName)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
