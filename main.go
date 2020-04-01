@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httputil"
+	"os"
 )
 
 func main() {
@@ -69,5 +70,11 @@ func main() {
 		dump, _ := httputil.DumpRequest(req, true)
 		log.Println(string(dump))
 	})
-	_ = http.ListenAndServe(":8080", nil)
+
+	port := os.Getenv("HTTP_PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Printf("server is listening at port %s", port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
 }
