@@ -8,11 +8,11 @@ import (
 var TargetNameRegex *regexp.Regexp
 
 func CompileRegexes() {
-	createNameRegex, err := regexp.Compile(`\W|\s`)
+	targetNameRegex, err := regexp.Compile(`\W|\s`)
 	if err != nil {
 		log.Fatal(err)
 	}
-	TargetNameRegex = createNameRegex
+	TargetNameRegex = targetNameRegex
 }
 
 func ApplyTargetNameRegex(base string) string {
