@@ -16,6 +16,7 @@ type dynamicConfig struct {
 	Gateway          string
 	Nameservers      []string
 	TargetDirectory  string
+	DeleteDirectory  string
 }
 
 type config struct {
@@ -24,6 +25,7 @@ type config struct {
 	WebhookUrl        string
 	WebhookAuthHeader string
 	WebhookAuthToken  string
+	PowerOffTimeout   string
 	ActiveIds         []string
 	DynamicConfigs    map[string]dynamicConfig
 }
@@ -36,6 +38,12 @@ func InitConfig() {
 		httpPort = "8080"
 	}
 	Config.HttpPort = httpPort
+
+	powerOffTimeout := os.Getenv("POWER_OFF_TIMEOUT")
+	if powerOffTimeout == "" {
+		powerOffTimeout = "1m"
+	}
+	Config.PowerOffTimeout = powerOffTimeout
 
 	Config.GovcInsecure = os.Getenv("GOVC_INSECURE")
 
@@ -60,6 +68,7 @@ func InitConfig() {
 		dynamicConfig.Gateway = os.Getenv(id + "_GATEWAY")
 		dynamicConfig.Nameservers = strings.Split(os.Getenv(id+"_NAMESERVERS"), ",")
 		dynamicConfig.TargetDirectory = os.Getenv(id + "_TARGET_DIRECTORY")
+		dynamicConfig.DeleteDirectory = os.Getenv(id + "_DELETE_DIRECTORY")
 		Config.DynamicConfigs[id] = dynamicConfig
 	}
 
