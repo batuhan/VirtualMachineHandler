@@ -12,7 +12,7 @@ type config struct {
 
 var Config = config{}
 
-func Init() {
+func InitConfig() {
 	httpPort := os.Getenv("HTTP_PORT")
 	if httpPort == "" {
 		httpPort = "8080"

@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	helpers.Init()
+	helpers.InitConfig()
 
 	http.HandleFunc("/env", actions.Env)
 	http.HandleFunc("/create", func(w http.ResponseWriter, req *http.Request) {
