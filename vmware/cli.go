@@ -1,6 +1,7 @@
 package vmware
 
 import (
+	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
 	"log"
 	"os"
 	"os/exec"
@@ -12,7 +13,7 @@ func Execute(baseEnv string, doLog bool, logger *log.Logger, arg ...string) ([]b
 		logger.Println(cmd.Args)
 	}
 	cmd.Env = []string{
-		"GOVC_INSECURE=" + os.Getenv("GOVC_INSECURE"),
+		"GOVC_INSECURE=" + helpers.Config.GovcInsecure,
 		"GOVC_URL=" + os.Getenv(baseEnv+"_GOVC_URL"),
 		"GOVC_USERNAME=" + os.Getenv(baseEnv+"_GOVC_USERNAME"),
 		"GOVC_PASSWORD=" + os.Getenv(baseEnv+"_GOVC_PASSWORD"),

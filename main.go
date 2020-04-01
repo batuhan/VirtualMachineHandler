@@ -8,10 +8,11 @@ import (
 	"log"
 	"net/http"
 	"net/http/httputil"
-	"os"
 )
 
 func main() {
+	helpers.Init()
+
 	http.HandleFunc("/env", actions.Env)
 	http.HandleFunc("/create", func(w http.ResponseWriter, req *http.Request) {
 		uuid := helpers.GenerateUUID()
@@ -71,10 +72,6 @@ func main() {
 		log.Println(string(dump))
 	})
 
-	port := os.Getenv("HTTP_PORT")
-	if port == "" {
-		port = "8080"
-	}
-	log.Printf("server is listening at port %s", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
+	log.Printf("server is listening at port %s", helpers.Config.HttpPort)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", helpers.Config.HttpPort), nil))
 }
