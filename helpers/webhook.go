@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"os"
 )
 
 type Webhook struct {
@@ -15,6 +14,7 @@ type Webhook struct {
 	ErrorExplanation string `json:"errorExplanation,omitempty"`
 	Password         string `json:"password,omitempty"`
 	VCenterId        string `json:"vCenterId,omitempty"`
+	LocationId       string `json:"locationId,omitempty"`
 }
 
 func SendWebhook(data Webhook, logger *log.Logger) {
@@ -25,15 +25,17 @@ func SendWebhook(data Webhook, logger *log.Logger) {
 	}
 	logger.Println(string(requestBody))
 
-	req, err := http.NewRequest("POST", os.Getenv("WEBHOOK_URL"), bytes.NewBuffer(requestBody))
+	location := Config.Locations[data.LocationId]
+
+	req, err := http.NewRequest("POST", location.WebhookUrl, bytes.NewBuffer(requestBody))
 	if err != nil {
 		logger.Println(err.Error())
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	authHeader := os.Getenv("WEBHOOK_AUTH_HEADER")
-	authToken := os.Getenv("WEBHOOK_AUTH_TOKEN")
+	authHeader := location.WebhookAuthHeader
+	authToken := location.WebhookAuthToken
 	if authToken != "" && authHeader != "" {
 		req.Header.Set(authHeader, authToken)
 	}

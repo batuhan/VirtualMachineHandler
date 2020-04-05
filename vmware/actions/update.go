@@ -10,7 +10,7 @@ import (
 )
 
 func GetPowerState(body helpers.Update, logger *log.Logger, uuid uuid.UUID) *string {
-	out, err := vmware.GetVMInfoDump(body.Identifier, body.TargetName, logger)
+	out, err := vmware.GetVMInfoDump(body.LocationId, body.TargetName, logger)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
@@ -28,9 +28,9 @@ func GetPowerState(body helpers.Update, logger *log.Logger, uuid uuid.UUID) *str
 }
 
 func Update(body helpers.Update, uuid uuid.UUID) {
-	logger := helpers.CreateLogger(body.Identifier + " " + body.TargetName)
+	logger := helpers.CreateLogger(body.LocationId + " " + body.TargetName)
 
-	out, err := vmware.Execute(body.Identifier, true, logger, "vm.power", "-off=true", body.TargetName)
+	out, err := vmware.Execute(body.LocationId, true, logger, "vm.power", "-off=true", body.TargetName)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
@@ -66,7 +66,7 @@ func Update(body helpers.Update, uuid uuid.UUID) {
 	}, logger)
 
 	if body.Cpu != 0 {
-		out, err := vmware.Execute(body.Identifier, true, logger, "vm.change", "-vm="+body.TargetName, "-c="+strconv.Itoa(body.Cpu))
+		out, err := vmware.Execute(body.LocationId, true, logger, "vm.change", "-vm="+body.TargetName, "-c="+strconv.Itoa(body.Cpu))
 		if err != nil {
 			logger.Println(err.Error())
 			logger.Println(string(out))
@@ -86,7 +86,7 @@ func Update(body helpers.Update, uuid uuid.UUID) {
 	}
 
 	if body.Memory != 0 {
-		out, err := vmware.Execute(body.Identifier, true, logger, "vm.change", "-vm="+body.TargetName, "-m="+strconv.Itoa(body.Memory))
+		out, err := vmware.Execute(body.LocationId, true, logger, "vm.change", "-vm="+body.TargetName, "-m="+strconv.Itoa(body.Memory))
 		if err != nil {
 			logger.Println(err.Error())
 			logger.Println(string(out))
@@ -106,7 +106,7 @@ func Update(body helpers.Update, uuid uuid.UUID) {
 	}
 
 	if body.DiskSize != "" {
-		out, err := vmware.Execute(body.Identifier, true, logger, "vm.disk.change", "-vm="+body.TargetName, "-size="+body.DiskSize)
+		out, err := vmware.Execute(body.LocationId, true, logger, "vm.disk.change", "-vm="+body.TargetName, "-size="+body.DiskSize)
 		time.Sleep(5 * time.Second)
 		if err != nil {
 			logger.Println(err.Error())
@@ -126,7 +126,7 @@ func Update(body helpers.Update, uuid uuid.UUID) {
 		}, logger)
 	}
 
-	out, err = vmware.Execute(body.Identifier, true, logger, "vm.power", "-on=true", body.TargetName)
+	out, err = vmware.Execute(body.LocationId, true, logger, "vm.power", "-on=true", body.TargetName)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))

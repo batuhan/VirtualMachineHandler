@@ -7,7 +7,7 @@ import (
 )
 
 func ChangeState(body helpers.State, uuid uuid.UUID) {
-	logger := helpers.CreateLogger(body.Identifier + " " + body.TargetName)
+	logger := helpers.CreateLogger(body.LocationId + " " + body.TargetName)
 
 	nextState := ""
 
@@ -33,7 +33,7 @@ func ChangeState(body helpers.State, uuid uuid.UUID) {
 		return
 	}
 
-	out, err := vmware.Execute(body.Identifier, true, logger, "vm.power", "-"+nextState+"=true", body.TargetName)
+	out, err := vmware.Execute(body.LocationId, true, logger, "vm.power", "-"+nextState+"=true", body.TargetName)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))

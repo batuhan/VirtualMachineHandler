@@ -8,13 +8,12 @@ import (
 	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
 	"gitlab.com/nod/bigcore/VirtualMachineHandler/vmware"
 	"gopkg.in/yaml.v2"
-	"os"
 	"strconv"
 	"strings"
 )
 
 func Create(body helpers.Create, uuid uuid.UUID) {
-	logger := helpers.CreateLogger(body.Identifier + " " + body.TargetName)
+	logger := helpers.CreateLogger(body.LocationId + " " + body.TargetName)
 
 	pass, err := password.Generate(12, 2, 2, false, false)
 	if err != nil {
@@ -28,7 +27,7 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 		return
 	}
 
-	networkTemplate := helpers.CreateNetworkTemplate(body.Identifier, body.IpToAssign)
+	networkTemplate := helpers.CreateNetworkTemplate(body.LocationId, body.IpToAssign)
 
 	template := helpers.GenerateBaseTemplate(body.SshKey, body.OnFirstBoot)
 	var metadata *helpers.Metadata
@@ -81,7 +80,7 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 		Success: true,
 	}, logger)
 
-	out, err := vmware.Execute(body.Identifier, true, logger, "vm.clone", "-vm="+body.Template, "-on=false",
+	out, err := vmware.Execute(body.LocationId, true, logger, "vm.clone", "-vm="+body.Template, "-on=false",
 		"-c="+strconv.Itoa(body.Cpu), "-m="+strconv.Itoa(body.Memory), body.TargetName)
 	if err != nil {
 		logger.Println(err.Error())
@@ -100,8 +99,8 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 		Success: true,
 	}, logger)
 
-	out, err = vmware.Execute(body.Identifier, true, logger, "object.mv", "./vm/"+body.TargetName,
-		os.Getenv(body.Identifier+"_TARGET_DIRECTORY"))
+	out, err = vmware.Execute(body.LocationId, true, logger, "object.mv", "./vm/"+body.TargetName,
+		helpers.Config.Locations[body.LocationId].TargetDirectory)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
@@ -119,7 +118,7 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 		Success: true,
 	}, logger)
 
-	out, err = vmware.Execute(body.Identifier, true, logger, "vm.disk.change", "-vm="+body.TargetName, "-size="+body.DiskSize)
+	out, err = vmware.Execute(body.LocationId, true, logger, "vm.disk.change", "-vm="+body.TargetName, "-size="+body.DiskSize)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
@@ -138,7 +137,7 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 	}, logger)
 
 	if isCentos7 || isCentos8 || isDebian {
-		out, err = vmware.Execute(body.Identifier, true, logger, "vm.change", "-vm="+body.TargetName,
+		out, err = vmware.Execute(body.LocationId, true, logger, "vm.change", "-vm="+body.TargetName,
 			"-e=guestinfo.metadata=\""+base64.StdEncoding.EncodeToString(metadataString)+"\"", "-e=guestinfo.metadata.encoding=base64")
 		if err != nil {
 			logger.Println(err.Error())
@@ -153,7 +152,7 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 		}
 	}
 
-	out, err = vmware.Execute(body.Identifier, true, logger, "vm.change", "-vm="+body.TargetName,
+	out, err = vmware.Execute(body.LocationId, true, logger, "vm.change", "-vm="+body.TargetName,
 		"-e=guestinfo.userdata=\""+base64.StdEncoding.EncodeToString(userData)+"\"", "-e=guestinfo.userdata.encoding=base64")
 	if err != nil {
 		logger.Println(err.Error())
@@ -172,7 +171,7 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 		Success: true,
 	}, logger)
 
-	out, err = vmware.Execute(body.Identifier, true, logger, "vm.power", "-on=true", body.TargetName)
+	out, err = vmware.Execute(body.LocationId, true, logger, "vm.power", "-on=true", body.TargetName)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
@@ -187,7 +186,7 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 
 	// get vCenter ID
 	// /VirtualMachines/0/Self/Value
-	out, err = vmware.GetVMInfoDump(body.Identifier, body.TargetName, logger)
+	out, err = vmware.GetVMInfoDump(body.LocationId, body.TargetName, logger)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
