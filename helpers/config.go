@@ -18,6 +18,7 @@ type location struct {
 	Gateway         string
 	Nameservers     []string
 	TargetDirectory string
+	DeleteDirectory  string
 
 	WebhookUrl        string
 	WebhookAuthHeader string
@@ -26,7 +27,9 @@ type location struct {
 
 type config struct {
 	HttpPort  string
+	PowerOffTimeout   string
 	Locations map[string]location
+
 }
 
 var Config = config{}
@@ -84,6 +87,11 @@ func getLocationConfigFromEnv(locationId string, defaults location) location {
 		location.TargetDirectory = defaults.TargetDirectory
 	}
 
+	location.DeleteDirectory = os.Getenv(locationId + "_DELETE_DIRECTORY")
+	if location.DeleteDirectory == "" {
+		location.DeleteDirectory = defaults.DeleteDirectory
+	}
+
 	location.WebhookUrl = os.Getenv("WEBHOOK_URL")
 	if location.WebhookUrl == "" {
 		location.WebhookUrl = defaults.WebhookUrl
@@ -108,6 +116,12 @@ func InitConfig() {
 		httpPort = "8080"
 	}
 	Config.HttpPort = httpPort
+
+	powerOffTimeout := os.Getenv("POWER_OFF_TIMEOUT")
+	if powerOffTimeout == "" {
+		powerOffTimeout = "1m"
+	}
+	Config.PowerOffTimeout = powerOffTimeout
 
 	locationIds := strings.Split(os.Getenv("LOCATION_IDS"), ",")
 

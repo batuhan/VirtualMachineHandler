@@ -12,7 +12,7 @@ import (
 
 func main() {
 	helpers.InitConfig()
-
+	helpers.CompileRegexes()
 	http.HandleFunc("/env", actions.Env)
 	http.HandleFunc("/create", func(w http.ResponseWriter, req *http.Request) {
 		uuid := helpers.GenerateUUID()

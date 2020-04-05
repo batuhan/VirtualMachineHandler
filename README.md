@@ -21,6 +21,7 @@ IDENTIFIER_GOVC_DATACENTER=xxx
 IDENTIFIER_GOVC_DATASTORE=xxx
 IDENTIFIER_GOVC_RESOURCE_POOL=xxx
 
+IDENTIFIER_DELETE_DIRECTORY=xxx
 IDENTIFIER_TARGET_DIRECTORY=xxx
 IDENTIFIER_GATEWAY=xxx
 IDENTIFIER_NAMESERVERS=8.8.8.8,8.8.4.4
@@ -28,6 +29,9 @@ IDENTIFIER_NAMESERVERS=8.8.8.8,8.8.4.4
 IDENTIFIER_WEBHOOK_URL=xxx
 IDENTIFIER_WEBHOOK_AUTH_HEADER=xxx
 IDENTIFIER_WEBHOOK_AUTH_TOKEN=xxx
+
+HTTP_PORT=8080
+POWER_OFF_TIMEOUT=1m
 ```
 
 Remember to replace `IDENTIFIER` with a location ID like `AMS1` (or anything you like). 
@@ -37,7 +41,6 @@ If you are using a single location, you can define the defaults and use `DEFAULT
 
 You also need to set `LOCATION_IDS` with a comma separated list of location identifiers
 
-You can set the port the server runs on with `HTTP_PORT`.
 
 ## Usage
 

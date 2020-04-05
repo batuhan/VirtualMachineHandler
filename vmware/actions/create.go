@@ -10,10 +10,15 @@ import (
 	"gopkg.in/yaml.v2"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func Create(body helpers.Create, uuid uuid.UUID) {
 	logger := helpers.CreateLogger(body.LocationId + " " + body.TargetName)
+
+	currentDate := time.Now().UTC().Format(time.RFC3339)
+	vmName := currentDate + "_" + body.TargetName
+	vmName = helpers.ApplyTargetNameRegex(vmName)
 
 	pass, err := password.Generate(12, 2, 2, false, false)
 	if err != nil {
@@ -80,8 +85,8 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 		Success: true,
 	}, logger)
 
-	out, err := vmware.Execute(body.LocationId, true, logger, "vm.clone", "-vm="+body.Template, "-on=false",
-		"-c="+strconv.Itoa(body.Cpu), "-m="+strconv.Itoa(body.Memory), body.TargetName)
+	out, err := vmware.Execute(body.LocationId, true, logger, "vm.clone", "-vm="+body.Template,
+		"-on=false", "-c="+strconv.Itoa(body.Cpu), "-m="+strconv.Itoa(body.Memory), vmName)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
@@ -99,8 +104,8 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 		Success: true,
 	}, logger)
 
-	out, err = vmware.Execute(body.LocationId, true, logger, "object.mv", "./vm/"+body.TargetName,
-		helpers.Config.Locations[body.LocationId].TargetDirectory)
+	out, err = vmware.Execute(body.LocationId, true, logger, "object.mv", "./vm/"+vmName,
+		helpers.Config.DynamicConfigs[body.LocationId].TargetDirectory)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
@@ -118,7 +123,8 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 		Success: true,
 	}, logger)
 
-	out, err = vmware.Execute(body.LocationId, true, logger, "vm.disk.change", "-vm="+body.TargetName, "-size="+body.DiskSize)
+	out, err = vmware.Execute(body.LocationId, true, logger, "vm.disk.change", "-vm="+vmName,
+		"-size="+body.DiskSize)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
@@ -137,8 +143,9 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 	}, logger)
 
 	if isCentos7 || isCentos8 || isDebian {
-		out, err = vmware.Execute(body.LocationId, true, logger, "vm.change", "-vm="+body.TargetName,
-			"-e=guestinfo.metadata=\""+base64.StdEncoding.EncodeToString(metadataString)+"\"", "-e=guestinfo.metadata.encoding=base64")
+		out, err = vmware.Execute(body.LocationId, true, logger, "vm.change", "-vm="+vmName,
+			"-e=guestinfo.metadata=\""+base64.StdEncoding.EncodeToString(metadataString)+"\"",
+			"-e=guestinfo.metadata.encoding=base64")
 		if err != nil {
 			logger.Println(err.Error())
 			logger.Println(string(out))
@@ -152,8 +159,9 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 		}
 	}
 
-	out, err = vmware.Execute(body.LocationId, true, logger, "vm.change", "-vm="+body.TargetName,
-		"-e=guestinfo.userdata=\""+base64.StdEncoding.EncodeToString(userData)+"\"", "-e=guestinfo.userdata.encoding=base64")
+	out, err = vmware.Execute(body.LocationId, true, logger, "vm.change", "-vm="+vmName,
+		"-e=guestinfo.userdata=\""+base64.StdEncoding.EncodeToString(userData)+"\"",
+		"-e=guestinfo.userdata.encoding=base64")
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
@@ -171,7 +179,7 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 		Success: true,
 	}, logger)
 
-	out, err = vmware.Execute(body.LocationId, true, logger, "vm.power", "-on=true", body.TargetName)
+	out, err = vmware.Execute(body.LocationId, true, logger, "vm.power", "-on=true", vmName)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
@@ -186,7 +194,7 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 
 	// get vCenter ID
 	// /VirtualMachines/0/Self/Value
-	out, err = vmware.GetVMInfoDump(body.LocationId, body.TargetName, logger)
+	out, err = vmware.GetVMInfoDump(body.LocationId, vmName, logger)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
