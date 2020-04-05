@@ -10,7 +10,7 @@ func ChangeState(body helpers.State, uuid uuid.UUID) {
 	logger := helpers.CreateLogger(body.LocationId + " " + body.TargetName)
 
 	baseVMName := helpers.ApplyTargetNameRegex(body.TargetName)
-	vmName, err := vmware.FindVM(body.Identifier, logger, baseVMName, uuid)
+	vmName, err := vmware.FindVM(body.LocationId, logger, baseVMName, uuid)
 	if err != nil {
 		return
 	}

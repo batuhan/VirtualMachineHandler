@@ -8,23 +8,23 @@ import (
 	"time"
 )
 
-func GetPowerState(body helpers.Update, logger *log.Logger, uuid uuid.UUID) *string {
-	out, err := vmware.GetVMInfoDump(body.LocationId, body.TargetName, logger)
-	if err != nil {
-		logger.Println(err.Error())
-		logger.Println(string(out))
-		go helpers.SendWebhook(helpers.Webhook{
-			Uuid:             uuid.String(),
-			Step:             "getPowerState",
-			Success:          false,
-			ErrorExplanation: err.Error() + "\n" + string(out),
-		}, logger)
-		return nil
-	}
-
-	dump := helpers.ParseVMInfoDump(out, logger)
-	return &dump.VirtualMachines[0].Summary.Runtime.PowerState
-}
+//func GetPowerState(body helpers.Update, logger *log.Logger, uuid uuid.UUID) *string {
+//	out, err := vmware.GetVMInfoDump(body.LocationId, body.TargetName, logger)
+//	if err != nil {
+//		logger.Println(err.Error())
+//		logger.Println(string(out))
+//		go helpers.SendWebhook(helpers.Webhook{
+//			Uuid:             uuid.String(),
+//			Step:             "getPowerState",
+//			Success:          false,
+//			ErrorExplanation: err.Error() + "\n" + string(out),
+//		}, logger)
+//		return nil
+//	}
+//
+//	dump := helpers.ParseVMInfoDump(out, logger)
+//	return &dump.VirtualMachines[0].Summary.Runtime.PowerState
+//}
 
 func Update(body helpers.Update, uuid uuid.UUID) {
 	logger := helpers.CreateLogger(body.LocationId + " " + body.TargetName)

@@ -105,7 +105,7 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 	}, logger)
 
 	out, err = vmware.Execute(body.LocationId, true, logger, "object.mv", "./vm/"+vmName,
-		helpers.Config.DynamicConfigs[body.LocationId].TargetDirectory)
+		helpers.Config.Locations[body.LocationId].TargetDirectory)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))

@@ -21,7 +21,7 @@ func Delete(identifier string, targetName string, uuid uuid.UUID) error {
 	}
 
 	out, err := vmware.Execute(identifier, true, logger, "object.mv", vmName,
-		helpers.Config.DynamicConfigs[identifier].DeleteDirectory)
+		helpers.Config.Locations[identifier].DeleteDirectory)
 	if err != nil {
 		logger.Println(err.Error())
 		logger.Println(string(out))
