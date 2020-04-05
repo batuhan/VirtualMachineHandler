@@ -6,7 +6,7 @@ import (
 )
 
 func Recreate(body helpers.Create, uuid uuid.UUID) {
-	err := Delete(body.Identifier, body.TargetName, uuid)
+	err := Delete(body.LocationId, body.TargetName, uuid)
 	if err != nil {
 		return
 	}

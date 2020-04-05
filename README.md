@@ -1,6 +1,18 @@
-## env variables
+# Virtual Machine Handler
+
+This project is a wrapper around VMWare's GOVC command line tool to easily provision virtual machines & manage them via
+a simple REST API. Uses `cloud-init` to provision the servers. You must have templates set up before running VMH. 
+
+We have a set of Packer-based template generators for various versions of Ubuntu, CentOS & Debian.
+
+**WORK IN PROGRESS**
+
+## Configuration
+
+First need to pass vCenter configuration in your environment:
+ 
 ```
-GOVC_INSECURE=1
+IDENTIFIER_GOVC_INSECURE=1
 
 IDENTIFIER_GOVC_URL=xxx
 IDENTIFIER_GOVC_USERNAME=xxx
@@ -13,19 +25,33 @@ IDENTIFIER_TARGET_DIRECTORY=xxx
 IDENTIFIER_GATEWAY=xxx
 IDENTIFIER_NAMESERVERS=8.8.8.8,8.8.4.4
 
-WEBHOOK_URL=xxx
-WEBHOOK_AUTH_HEADER=xxx
-WEBHOOK_AUTH_TOKEN=xxx
+IDENTIFIER_WEBHOOK_URL=xxx
+IDENTIFIER_WEBHOOK_AUTH_HEADER=xxx
+IDENTIFIER_WEBHOOK_AUTH_TOKEN=xxx
 ```
-pass identifier in the request body, like below
 
-## example requests
+Remember to replace `IDENTIFIER` with a location ID like `AMS1` (or anything you like). 
+You can also define a `DEFAULT` location.
+
+If you are using a single location, you can define the defaults and use `DEFAULT` as your location ID.
+
+You also need to set `LOCATION_IDS` with a comma separated list of location identifiers
+
+You can set the port the server runs on with `HTTP_PORT`.
+
+## Usage
+
+VMH routes are basically RPC routes. Every action sent as a `POST` request with a JSON body. Endpoints are called actions.
+
+For each request, you'll need to send `LocationId` & `TargetName`. 
+
 ### env
 ```json
 {
   "identifier": "CENTER2"
 }
 ```
+
 ### create / recreate
 ```json
 {
@@ -39,6 +65,7 @@ pass identifier in the request body, like below
   "ipToAssign": "1.1.1.1"
 }
 ```
+
 ### delete
 ```json
 {
@@ -46,6 +73,7 @@ pass identifier in the request body, like below
   "targetName": "UbuntuTarget"
 }
 ```
+
 ### update
 ```json
 {
@@ -57,6 +85,7 @@ pass identifier in the request body, like below
 }
 ```
 `cpu`, `memory` and `diskSize` fields can be omitted, only provided values will be updated 
+
 ### state
 ```json
 {
@@ -66,6 +95,7 @@ pass identifier in the request body, like below
 }
 ```
 `action` must be one of the following values: `on | off | suspend | shutdown | reboot`
+
 #### other
 template names must contain one of the following values, lower/upper case doesn't matter
 ```

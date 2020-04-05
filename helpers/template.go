@@ -3,7 +3,6 @@ package helpers
 import (
 	"encoding/base64"
 	"gopkg.in/yaml.v2"
-	"os"
 	"strings"
 )
 
@@ -129,8 +128,8 @@ func CreateNetworkTemplate(identifier string, ipToAssign string) *Network {
 	eth0 := template.Network.Ethernets.Eth0
 	eth0.Match.Name = "ens*"
 	eth0.Addresses = []string{ipToAssign + "/24"}
-	eth0.Gateway4 = os.Getenv(identifier + "_GATEWAY")
-	eth0.Nameservers.Addresses = strings.Split(os.Getenv(identifier+"_NAMESERVERS"), ",")
+	eth0.Gateway4 = Config.Locations[identifier].Gateway
+	eth0.Nameservers.Addresses = Config.Locations[identifier].Nameservers
 	template.Network.Ethernets.Eth0 = eth0
 	template.Network.Ethernets.Ens192 = eth0
 	return &template

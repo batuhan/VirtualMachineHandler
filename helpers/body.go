@@ -7,7 +7,7 @@ import (
 )
 
 type Body struct {
-	Identifier string
+	LocationId string
 	TargetName string
 }
 

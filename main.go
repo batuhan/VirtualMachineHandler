@@ -11,6 +11,8 @@ import (
 )
 
 func main() {
+	helpers.InitConfig()
+
 	http.HandleFunc("/env", actions.Env)
 	http.HandleFunc("/create", func(w http.ResponseWriter, req *http.Request) {
 		uuid := helpers.GenerateUUID()
@@ -31,7 +33,7 @@ func main() {
 			log.Println(err.Error())
 		}
 		go func() {
-			_ = actions.Delete(body.Identifier, body.TargetName, uuid)
+			_ = actions.Delete(body.LocationId, body.TargetName, uuid)
 		}()
 	})
 	http.HandleFunc("/recreate", func(w http.ResponseWriter, req *http.Request) {
@@ -69,5 +71,7 @@ func main() {
 		dump, _ := httputil.DumpRequest(req, true)
 		log.Println(string(dump))
 	})
-	_ = http.ListenAndServe(":8080", nil)
+
+	log.Printf("server is listening at port %s", helpers.Config.HttpPort)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", helpers.Config.HttpPort), nil))
 }
