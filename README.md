@@ -132,9 +132,9 @@ For each request, you'll need to send `locationId` & `targetName`.
 
 `action` must be one of the following values: `on | off | suspend | shutdown | reboot`
 
-#### other
+#### Notes
 
-template names must contain one of the following values, lower/upper case doesn't matter
+Template names must contain one of the following values, lower/upper case doesn't matter
 
 ```
 centos-7
@@ -143,15 +143,15 @@ ubuntu
 debian
 ```
 
-## while creating vmware templates
+## Creating VMware templates
 
-the only user with login access should be `root`
+The only user with login access should be `root`
 
 `cloud-init clean` should be run after every change to template
 
 ### Ubuntu
 
-#### to install
+#### Install
 
 ```
 apt install python3-pip
@@ -161,11 +161,9 @@ cloud-init clean
 
 ### Centos
 
-#### to install
+#### Install
 
 ```
 yum install python3
 curl -sSL https://raw.githubusercontent.com/vmware/cloud-init-vmware-guestinfo/master/install.sh | sh -
 ```
-
-`cloud-init clean` after every change to template
