@@ -171,7 +171,7 @@ curl -sSL https://raw.githubusercontent.com/vmware/cloud-init-vmware-guestinfo/m
 cloud-init clean
 ```
 
-### Centos
+### CentOS
 
 #### Install
 
