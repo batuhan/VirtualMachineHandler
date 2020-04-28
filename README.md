@@ -14,6 +14,7 @@ We have a set of Packer-based template generators for various versions of Ubuntu
 * Uses `cloud-init` to provision servers, providing compatibility between different linux distros.
 * Backend agnostic. VMH provides its own minimal REST API, so you can attach it to your existing infrastructure easily.
 * Security first. VMH generates passwords randomly and requires users to change their password on first login.
+* Async by default. Non-blocking calls with HTTP callbacks. You can define auth headers and tokens for verification too.
 * Manage multiple datacenter configurations with a single deployment and without a database.
 * Default configuration that can be shared between multiple datacenter configurations.
 * Handle machine state via an easy REST API. Available actions as on, off, suspend, shutdown and reboot.
