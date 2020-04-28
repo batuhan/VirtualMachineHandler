@@ -79,7 +79,7 @@ In this example, both configurations will have a value of `1` for `GOVC_INSECURE
 
 ## Usage
 
-VMH routes are basically RPC routes. Every action sent as a `POST` request with a JSON body. Endpoints are called actions.
+VMH routes are basically RPC routes. Every action sent as a `POST` request with a JSON body. We refer to endpoints as actions.
 
 For each request, you'll need to send `locationId` & `targetName`.
 
