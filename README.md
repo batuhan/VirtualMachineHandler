@@ -3,9 +3,20 @@
 This project is a wrapper around VMWare's GOVC command line tool to easily provision virtual machines & manage them via
 a simple REST API. Uses `cloud-init` to provision the servers. You must have templates set up before running VMH.
 
+Templates that we use can be found under `packer` directory.
+
 We have a set of Packer-based template generators for various versions of Ubuntu, CentOS & Debian.
 
 **WORK IN PROGRESS**
+
+## Features
+
+* Uses `cloud-init` to provision servers, providing compatibility between different linux distros.
+* Backend agnostic. VMH provides its own minimal REST API, so you can attach it to your existing infrastructure easily.
+* Security first. VMH generates passwords randomly and requires users to change their password on first login.
+* Manage multiple datacenter configurations with a single deployment and without a database.
+* Default configuration that can be shared between multiple datacenter configurations.
+* Handle machine state via an easy REST API. Available actions as on, off, suspend, shutdown and reboot.
 
 ## Configuration
 
