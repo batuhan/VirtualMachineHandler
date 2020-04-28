@@ -56,13 +56,13 @@ You also need to set `LOCATION_IDS` with a comma separated list of location iden
 
 VMH routes are basically RPC routes. Every action sent as a `POST` request with a JSON body. Endpoints are called actions.
 
-For each request, you'll need to send `LocationId` & `TargetName`.
+For each request, you'll need to send `locationId` & `targetName`.
 
 ### env
 
 ```json
 {
-  "identifier": "CENTER2"
+  "locationId": "IDENTIFIER"
 }
 ```
 
@@ -70,7 +70,7 @@ For each request, you'll need to send `LocationId` & `TargetName`.
 
 ```json
 {
-  "identifier": "IDENTIFIER",
+  "locationId": "IDENTIFIER",
   "template": "Ubuntu1804",
   "targetName": "UbuntuTarget",
   "cpu": 1,
@@ -85,7 +85,7 @@ For each request, you'll need to send `LocationId` & `TargetName`.
 
 ```json
 {
-  "identifier": "IDENTIFIER",
+  "locationId": "IDENTIFIER",
   "targetName": "UbuntuTarget"
 }
 ```
@@ -94,7 +94,7 @@ For each request, you'll need to send `LocationId` & `TargetName`.
 
 ```json
 {
-  "identifier": "CENTER2",
+  "locationId": "CENTER2",
   "targetName": "UbuntuTarget",
   "cpu": 1,
   "memory": 1024,
@@ -108,7 +108,7 @@ For each request, you'll need to send `LocationId` & `TargetName`.
 
 ```json
 {
-  "identifier": "IDENTIFIER",
+  "locationId": "IDENTIFIER",
   "targetName": "UbuntuTarget",
   "action": "shutdown"
 }
