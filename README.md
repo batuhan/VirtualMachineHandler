@@ -74,6 +74,9 @@ VMH routes are basically RPC routes. Every action sent as a `POST` request with 
 
 For each request, you'll need to send `locationId` & `targetName`.
 
+Calls are async by default. VMH will return only return a UUID as response.
+You can use this UUID to track the progress of request with callbacks.
+
 ### env
 
 ```json
