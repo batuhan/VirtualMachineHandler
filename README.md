@@ -22,7 +22,7 @@ We have a set of Packer-based template generators for various versions of Ubuntu
 
 First need to pass vCenter configuration in your environment:
 
-```
+```shell script
 IDENTIFIER_GOVC_INSECURE=1
 
 IDENTIFIER_GOVC_URL=xxx
@@ -41,16 +41,31 @@ IDENTIFIER_WEBHOOK_URL=xxx
 IDENTIFIER_WEBHOOK_AUTH_HEADER=xxx
 IDENTIFIER_WEBHOOK_AUTH_TOKEN=xxx
 
+LOCATION_IDS=IDENTIFIER1,IDENTIFIER2
+
 HTTP_PORT=8080
 POWER_OFF_TIMEOUT=1m
 ```
 
 Remember to replace `IDENTIFIER` with a location ID like `AMS1` (or anything you like).
-You can also define a `DEFAULT` location.
+
+You can define multiple datacenters.
+Each configuration extends the `DEFAULT` config.
 
 If you are using a single location, you can define the defaults and use `DEFAULT` as your location ID.
 
-You also need to set `LOCATION_IDS` with a comma separated list of location identifiers
+You also need to set `LOCATION_IDS` with a comma separated list of location identifiers.
+`DEFAULT` is enabled by default.
+
+### Example
+```shell script
+DEFAULT_GOVC_INSECURE=1
+AMS1_GOVC_URL=AMS1_URL
+AMS2_GOVC_URL=AMS2_URL
+LOCATION_IDS=AMS1,AMS2
+```
+
+In this example, both configurations will have a value of `1` for `GOVC_INSECURE`.
 
 ## Usage
 
