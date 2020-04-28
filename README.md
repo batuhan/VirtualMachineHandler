@@ -1,7 +1,7 @@
 # Virtual Machine Handler
 
 This project is a wrapper around VMWare's GOVC command line tool to easily provision virtual machines & manage them via
-a simple REST API. Uses `cloud-init` to provision the servers. You must have templates set up before running VMH. 
+a simple REST API. Uses `cloud-init` to provision the servers. You must have templates set up before running VMH.
 
 We have a set of Packer-based template generators for various versions of Ubuntu, CentOS & Debian.
 
@@ -10,7 +10,7 @@ We have a set of Packer-based template generators for various versions of Ubuntu
 ## Configuration
 
 First need to pass vCenter configuration in your environment:
- 
+
 ```
 IDENTIFIER_GOVC_INSECURE=1
 
@@ -34,21 +34,21 @@ HTTP_PORT=8080
 POWER_OFF_TIMEOUT=1m
 ```
 
-Remember to replace `IDENTIFIER` with a location ID like `AMS1` (or anything you like). 
+Remember to replace `IDENTIFIER` with a location ID like `AMS1` (or anything you like).
 You can also define a `DEFAULT` location.
 
 If you are using a single location, you can define the defaults and use `DEFAULT` as your location ID.
 
 You also need to set `LOCATION_IDS` with a comma separated list of location identifiers
 
-
 ## Usage
 
 VMH routes are basically RPC routes. Every action sent as a `POST` request with a JSON body. Endpoints are called actions.
 
-For each request, you'll need to send `LocationId` & `TargetName`. 
+For each request, you'll need to send `LocationId` & `TargetName`.
 
 ### env
+
 ```json
 {
   "identifier": "CENTER2"
@@ -56,6 +56,7 @@ For each request, you'll need to send `LocationId` & `TargetName`.
 ```
 
 ### create / recreate
+
 ```json
 {
   "identifier": "IDENTIFIER",
@@ -70,6 +71,7 @@ For each request, you'll need to send `LocationId` & `TargetName`.
 ```
 
 ### delete
+
 ```json
 {
   "identifier": "IDENTIFIER",
@@ -78,6 +80,7 @@ For each request, you'll need to send `LocationId` & `TargetName`.
 ```
 
 ### update
+
 ```json
 {
   "identifier": "CENTER2",
@@ -87,9 +90,11 @@ For each request, you'll need to send `LocationId` & `TargetName`.
   "diskSize": "50G"
 }
 ```
-`cpu`, `memory` and `diskSize` fields can be omitted, only provided values will be updated 
+
+`cpu`, `memory` and `diskSize` fields can be omitted, only provided values will be updated
 
 ### state
+
 ```json
 {
   "identifier": "IDENTIFIER",
@@ -97,10 +102,13 @@ For each request, you'll need to send `LocationId` & `TargetName`.
   "action": "shutdown"
 }
 ```
+
 `action` must be one of the following values: `on | off | suspend | shutdown | reboot`
 
 #### other
+
 template names must contain one of the following values, lower/upper case doesn't matter
+
 ```
 centos-7
 centos-8
@@ -117,16 +125,20 @@ the only user with login access should be `root`
 ### Ubuntu
 
 #### to install
+
 ```
 apt install python3-pip
 curl -sSL https://raw.githubusercontent.com/vmware/cloud-init-vmware-guestinfo/master/install.sh | sh -
 cloud-init clean
 ```
+
 ### Centos
 
 #### to install
+
 ```
 yum install python3
 curl -sSL https://raw.githubusercontent.com/vmware/cloud-init-vmware-guestinfo/master/install.sh | sh -
 ```
+
 `cloud-init clean` after every change to template
