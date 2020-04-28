@@ -1,3 +1,10 @@
 .idea
 output
 .govmomi
+
+# packer
+builds
+packer_cache
+environment.sh
+.vagrant
+ks*.cfg
