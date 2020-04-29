@@ -1,0 +1,4 @@
+---
+- src: geerlingguy.nfs
+- src: https://github.com/jgeusebroek/ansible-packer-provision.git
+  name: jgeusebroek.packer-provision

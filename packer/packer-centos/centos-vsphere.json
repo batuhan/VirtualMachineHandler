@@ -1,0 +1,128 @@
+{
+  "variables": {
+    "vm_name": "packer-centos-8-x86_64",
+    "vmware_guest_os_type": "centos64Guest",
+    "vmware_tools_type": "distro",
+    "cpus": "4",
+    "disk_size": "20480",
+    "disk_controller": "pvscsi",
+    "disk_thin": "true",
+    "memory": "1024",
+    "memory_reserve_all": "false",
+    "network_card": "vmxnet3",
+    "kickstart": "ks8.cfg",
+    "iso_checksum": "ea17ef71e0df3f6bf1d4bf1fc25bec1a76d1f211c115d39618fe688be34503e8",
+    "iso_checksum_type": "sha256",
+    "iso_name": "CentOS-8-x86_64-1905-dvd1.iso",
+    "ssh_username": "root",
+    "ssh_password": "toor",
+    "vsphere-vcenter-server": "{{env `PACKER_VSPHERE_VCENTER_SERVER`}}",
+    "vsphere-esxi-host": "{{env `PACKER_VSPHERE_ESXI_HOST`}}",
+    "vsphere-cluster": "{{env `PACKER_VSPHERE_CLUSTER`}}",
+    "vsphere-username": "{{env `PACKER_VSPHERE_USERNAME`}}",
+    "vsphere-password": "{{env `PACKER_VSPHERE_PASSWORD`}}",
+    "vsphere-datacenter": "{{env `PACKER_VSPHERE_DATACENTER`}}",
+    "vsphere-resource-pool": "{{env `PACKER_VSPHERE_RESOURCE_POOL`}}",
+    "vsphere-datastore": "{{env `PACKER_VSPHERE_DATASTORE`}}",
+    "vsphere-datastore-iso": "{{env `PACKER_VSPHERE_DATASTORE_ISO`}}",
+    "vsphere-network": "{{env `PACKER_VSPHERE_NETWORK`}}",
+    "vsphere-vm-version": "{{env `PACKER_VSPHERE_VM_VERSION`}}",
+    "vsphere-insecure-connection": "true",
+    "vsphere-convert-to-template": "true",
+    "ansible_cleanup": "true",
+    "ansible_update_os": "true",
+    "ansible_install_packages": "",
+    "ansible_unique_host_ssh_key": "true",
+    "ansible_configure_vagrant": "false",
+    "ansible_install_guest_tools": "true",
+    "ansible_remove_build_tools": "true",
+    "ansible_vmware_vm_tools": "dist",
+    "ansible_install_nfs": "false",
+    "whiteout": "false",
+    "http_port": "{{env `SERVER_HTTP_PORT`}}",
+    "public_ip": "{{env `SERVER_PUBLIC_IP`}}",
+    "net_ip": "{{env `PACKER_VSPHERE_NETWORK_IP`}}",
+    "net_mask": "{{env `PACKER_VSPHERE_NETWORK_MASK`}}",
+    "net_gw": "{{env `PACKER_VSPHERE_NETWORK_GATEWAY`}}",
+    "net_dns1": "{{env `DEFAULT_DNS1`}}",
+    "net_dns2": "{{env `DEFAULT_DNS2`}}"
+  },
+  "sensitive-variables": ["vmware-password", "ssh_password"],
+  "builders": [
+    {
+      "type": "vsphere-iso",
+      "vcenter_server": "{{user `vsphere-vcenter-server`}}",
+      "host": "{{user `vsphere-esxi-host`}}",
+      "username": "{{user `vsphere-username`}}",
+      "password": "{{user `vsphere-password`}}",
+      "insecure_connection": "{{user `vsphere-insecure-connection`}}",
+      "cluster": "{{user `vsphere-cluster`}}",
+      "datacenter": "{{user `vsphere-datacenter`}}",
+      "resource_pool": "{{user `vsphere-resource-pool`}}",
+      "datastore": "{{user `vsphere-datastore`}}",
+      "convert_to_template": "{{user `vsphere-convert-to-template`}}",
+      "vm_version": "{{user `vsphere-vm-version`}}",
+      "guest_os_type": "{{user `vmware_guest_os_type`}}",
+      "CPUs": "{{user `cpus`}}",
+      "disk_size": "{{user `disk_size`}}",
+      "RAM": "{{user `memory`}}",
+      "RAM_reserve_all": "{{user `memory_reserve_all`}}",
+      "network_card": "{{user `network_card`}}",
+      "network": "{{user `vsphere-network`}}",
+      "disk_controller_type": "{{user `disk_controller`}}",
+      "disk_thin_provisioned": "{{user `disk_thin`}}",
+      "vm_name": "{{ user `vm_name`}}",
+      "http_directory": "http",
+      "http_port_min": "{{user `http_port`}}",
+      "http_port_max": "{{user `http_port`}}",
+      "ssh_username": "{{user `ssh_username`}}",
+      "ssh_password": "{{user `ssh_password`}}",
+      "boot_command": [
+        "<up><wait><tab> text ip={{user `net_ip`}}::{{user `net_gw`}}:{{user `net_mask`}}:::none<wait>",
+        " nameserver={{user `net_dns1`}} nameserver={{user `net_dns2`}}<wait>",
+        " ks=http://{{user `public_ip`}}:{{user `http_port`}}/{{user `kickstart`}}<enter><wait>"
+      ],
+      "shutdown_command": "/sbin/halt -h -p",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
+      "iso_paths": [
+        "[{{user `vsphere-datastore-iso`}}] ISO/{{user `iso_name`}}"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "{{.Vars}} bash '{{.Path}}'",
+      "script": "scripts/ansible.sh"
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "ansible/main.yml",
+      "galaxy_file": "requirements.yml",
+      "extra_arguments": [
+        "--extra-vars \"",
+        "packer_update_os={{user `ansible_update_os` }} ",
+        "packer_install_packages={{user `ansible_install_packages` }} ",
+        "packer_unique_host_ssh_key={{user `ansible_unique_host_ssh_key` }} ",
+        "packer_configure_vagrant={{user `ansible_configure_vagrant` }} ",
+        "packer_install_guest_tools={{user `ansible_install_guest_tools` }} ",
+        "packer_remove_build_tools={{user `ansible_remove_build_tools` }} ",
+        "packer_vmware_vm_tools={{user `ansible_vmware_vm_tools` }} ",
+        "packer_install_nfs={{user `ansible_install_nfs` }} ",
+        "\""
+      ],
+      "clean_staging_directory": "true"
+    },
+    {
+      "type": "shell",
+      "expect_disconnect": "true",
+      "environment_vars": [
+        "ANSIBLE_CLEANUP={{user `ansible_cleanup`}}",
+        "WHITEOUT={{user `whiteout`}}"
+      ],
+      "execute_command": "{{.Vars}} bash '{{.Path}}'",
+      "scripts": ["scripts/cleanup.sh"]
+    }
+  ]
+}

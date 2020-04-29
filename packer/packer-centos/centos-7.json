@@ -1,0 +1,11 @@
+{
+  "_comment": "Build with `packer build -var-file=centos-7.json centos-vagrant.json`",
+  "vm_name": "packer-centos-7-x86_64",
+  "cpus": "8",
+  "disk_size": "20480",
+  "memory": "8192",
+  "kickstart": "ks7.cfg",
+  "iso_checksum": "9bba3da2876cb9fcf6c28fb636bcbd01832fe6d84cd7445fa58e44e569b3b4fe",
+  "iso_checksum_type": "sha256",
+  "iso_name": "CentOS-7-x86_64-DVD-1908.iso"
+}

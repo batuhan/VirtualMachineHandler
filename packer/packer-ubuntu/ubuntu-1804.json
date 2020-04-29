@@ -1,0 +1,15 @@
+{
+  "_comment": "Build with `packer build -var-file=ubuntu-1804.json ubuntu-vagrant.json`",
+  "vm_name": "packer-ubuntu-1804-amd64",
+  "ubuntu_version": "1804",
+  "vmware_guest_os_type": "ubuntu64Guest",
+  "cpus": "8",
+  "disk_size": "20480",
+  "memory": "8192",
+  "preseed": "preseed.cfg",
+  "boot_command_prefix": "<esc><wait><esc><wait><enter><wait>",
+  "iso_checksum": "a2cb36dc010d98ad9253ea5ad5a07fd6b409e3412c48f1860536970b073c98f5",
+  "iso_checksum_type": "sha256",
+  "iso_name": "ubuntu-18.04.2-server-amd64.iso",
+  "iso_download_url": "http://old-releases.ubuntu.com/releases/18.04.2/ubuntu-18.04.2-server-amd64.iso"
+}

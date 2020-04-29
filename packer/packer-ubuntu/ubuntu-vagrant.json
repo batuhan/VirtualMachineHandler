@@ -1,0 +1,174 @@
+{
+  "variables": {
+    "vm_name": "packer-ubuntu-1604-amd64",
+    "hostname": "localhost",
+    "domain": "",
+    "build_version": "",
+    "vmware_guest_os_type": "ubuntu-64",
+    "vmware_tools_location": "/home/vagrant/linux.iso",
+    "vmware_tools_type": "distro",
+    "virtualbox_guest_os_type": "Ubuntu_64",
+    "cpus": "4",
+    "disk_size": "20480",
+    "memory": "1024",
+    "preseed": "preseed.cfg",
+    "boot_command_prefix": "<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+    "headless": "",
+    "iso_checksum": "a2cb36dc010d98ad9253ea5ad5a07fd6b409e3412c48f1860536970b073c98f5",
+    "iso_checksum_type": "sha256",
+    "iso_name": "ubuntu-18.04.2-server-amd64.iso",
+    "iso_url": "http://cdimage.ubuntu.com/releases/18.04/release/ubuntu-18.04.2-server-amd64.iso",
+    "ssh_username": "vagrant",
+    "ssh_password": "vagrant",
+    "ansible_cleanup": "true",
+    "ansible_update_os": "true",
+    "ansible_install_packages": "",
+    "ansible_unique_host_ssh_key": "true",
+    "ansible_configure_vagrant": "true",
+    "ansible_install_guest_tools": "true",
+    "ansible_remove_build_tools": "true",
+    "ansible_vmware_vm_tools": "dist",
+    "ansible_install_nfs": "true",
+    "whiteout": "true"
+  },
+  "builders": [
+    {
+      "type": "vmware-iso",
+      "vm_name": "{{ user `vm_name`}}",
+      "boot_wait": "10s",
+      "http_directory": "http",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
+      "tools_upload_flavor": "linux",
+      "ssh_port": 22,
+      "ssh_username": "{{user `ssh_username`}}",
+      "ssh_password": "{{user `ssh_password`}}",
+      "ssh_wait_timeout": "10000s",
+      "floppy_files": ["http/{{user `preseed`}}"],
+      "headless": "{{ user `headless`}}",
+      "boot_command": [
+        "{{ user `boot_command_prefix` }}",
+        "/install/vmlinuz noapic",
+        " debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
+        " fb=false debconf/frontend=noninteractive",
+        " kbd-chooser/method=us",
+        " keyboard-configuration/modelcode=SKIP",
+        " keyboard-configuration/layout=USA",
+        " keyboard-configuration/variant=USA console-setup/ask_detect=false",
+        " netcfg/get_hostname={{ user `hostname` }}",
+        " passwd/username={{ user `ssh_username` }}",
+        " passwd/user-fullname={{ user `ssh_username` }}",
+        " passwd/user-password={{ user `ssh_password` }}",
+        " passwd/user-password-again={{ user `ssh_password` }}",
+        " file=/floppy/{{ user `preseed` }}",
+        " initrd=/install/initrd.gz -- <enter> "
+      ],
+      "shutdown_command": "echo '{{user `ssh_password`}}'|sudo -S shutdown -h now",
+      "version": "11",
+      "disk_size": "{{ user `disk_size`}}",
+      "vmx_data": {
+        "guestos": "{{ user `vmware_guest_os_type`}}",
+        "memsize": "{{user `memory`}}",
+        "numvcpus": "{{user `cpus`}}",
+        "cpuid.coresPerSocket": "1"
+      }
+    },
+    {
+      "type": "virtualbox-iso",
+      "vm_name": "{{ user `vm_name`}}",
+      "boot_wait": "10s",
+      "http_directory": "http",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
+      "ssh_port": 22,
+      "ssh_username": "{{user `ssh_username`}}",
+      "ssh_password": "{{user `ssh_password`}}",
+      "ssh_wait_timeout": "10000s",
+      "floppy_files": ["http/{{user `preseed`}}"],
+      "headless": "{{ user `headless`}}",
+      "boot_command": [
+        "{{ user `boot_command_prefix` }}",
+        "/install/vmlinuz noapic",
+        " debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
+        " fb=false debconf/frontend=noninteractive",
+        " kbd-chooser/method=us",
+        " keyboard-configuration/modelcode=SKIP",
+        " keyboard-configuration/layout=USA",
+        " keyboard-configuration/variant=USA console-setup/ask_detect=false",
+        " netcfg/get_hostname={{ user `hostname` }}",
+        " passwd/username={{ user `ssh_username` }}",
+        " passwd/user-fullname={{ user `ssh_username` }}",
+        " passwd/user-password={{ user `ssh_password` }}",
+        " passwd/user-password-again={{ user `ssh_password` }}",
+        " file=/floppy/{{ user `preseed` }}",
+        " initrd=/install/initrd.gz -- <enter> "
+      ],
+      "shutdown_command": "echo '{{user `ssh_password`}}'|sudo -S shutdown -h now",
+      "post_shutdown_delay": "30s",
+      "guest_os_type": "{{ user `virtualbox_guest_os_type` }}",
+      "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
+      "hard_drive_interface": "sata",
+      "virtualbox_version_file": ".vbox_version",
+      "disk_size": "{{user `disk_size`}}",
+      "vboxmanage": [
+        ["modifyvm", "{{.Name}}", "--memory", "{{user `memory`}}"],
+        ["modifyvm", "{{.Name}}", "--cpus", "{{user `cpus`}}"]
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "echo '{{user `ssh_username`}}' | {{.Vars}} sudo -E -S bash '{{.Path}}'",
+      "script": "scripts/vagrant.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo '{{user `ssh_username`}}' | {{.Vars}} sudo -E -S bash '{{.Path}}'",
+      "script": "scripts/ansible.sh"
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "ansible/main.yml",
+      "galaxy_file": "requirements.yml",
+      "extra_arguments": [
+        "--extra-vars \"",
+        "packer_update_os={{user `ansible_update_os` }} ",
+        "packer_install_packages={{user `ansible_install_packages` }} ",
+        "packer_unique_host_ssh_key={{user `ansible_unique_host_ssh_key` }} ",
+        "packer_configure_vagrant={{user `ansible_configure_vagrant` }} ",
+        "packer_install_guest_tools={{user `ansible_install_guest_tools` }} ",
+        "packer_remove_build_tools={{user `ansible_remove_build_tools` }} ",
+        "packer_vmware_vm_tools={{user `ansible_vmware_vm_tools` }} ",
+        "packer_install_nfs={{user `ansible_install_nfs` }} ",
+        "\""
+      ],
+      "clean_staging_directory": "true"
+    },
+    {
+      "type": "shell",
+      "expect_disconnect": "true",
+      "environment_vars": [
+        "ANSIBLE_CLEANUP={{user `ansible_cleanup`}}",
+        "WHITEOUT={{user `whiteout`}}"
+      ],
+      "execute_command": "echo '{{user `ssh_username`}}' | {{.Vars}} sudo -E -S bash '{{.Path}}'",
+      "scripts": ["scripts/cleanup.sh"]
+    }
+  ],
+  "post-processors": [
+    [
+      {
+        "type": "vagrant",
+        "output": "./builds/{{.Provider}}/{{ user `vm_name` }}_{{.Provider}}.box"
+      },
+      {
+        "type": "vagrant-cloud",
+        "box_tag": "jgeusebroek/ubuntu-{{user `ubuntu_version`}}",
+        "version": "{{user `build_version`}}"
+      }
+    ]
+  ]
+}

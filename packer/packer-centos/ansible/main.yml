@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: yes
+  gather_facts: yes
+
+  roles:
+    - role: geerlingguy.nfs
+      when: packer_install_nfs is defined and (packer_install_nfs == True or packer_install_nfs == "true" or packer_install_nfs == "yes")
+    - role: jgeusebroek.packer-provision

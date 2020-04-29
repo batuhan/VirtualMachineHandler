@@ -1,0 +1,142 @@
+{
+  "variables": {
+    "vm_name": "packer-ubuntu-1604-amd64",
+    "hostname": "localhost",
+    "domain": "",
+    "vmware_guest_os_type": "ubuntu-64",
+    "vmware_tools_type": "distro",
+    "cpus": "4",
+    "disk_size": "20480",
+    "memory": "1024",
+    "preseed": "preseed.cfg",
+    "boot_command_prefix": "<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+    "headless": "",
+    "iso_checksum": "a2cb36dc010d98ad9253ea5ad5a07fd6b409e3412c48f1860536970b073c98f5",
+    "iso_checksum_type": "sha256",
+    "iso_name": "ubuntu-18.04.2-server-amd64.iso",
+    "iso_url": "http://cdimage.ubuntu.com/releases/18.04/release/ubuntu-18.04.2-server-amd64.iso",
+    "ssh_username": "root",
+    "ssh_password": "toor",
+    "vmware-host": "{{env `PACKER_VMWARE_HOST`}}",
+    "vmware-username": "{{env `PACKER_VMWARE_USERNAME`}}",
+    "vmware-password": "{{env `PACKER_VMWARE_PASSWORD`}}",
+    "vmware-datastore": "{{env `PACKER_VMWARE_DATASTORE`}}",
+    "vmware-network": "{{env `PACKER_VMWARE_NETWORK`}}",
+    "vmware-mac": "{{env `PACKER_VMWARE_MAC`}}",
+    "vmware-vm-version": "{{env `PACKER_VMWARE_VM_VERSION`}}",
+    "vmware-output-format": "ova",
+    "ansible_cleanup": "true",
+    "ansible_update_os": "true",
+    "ansible_install_packages": "",
+    "ansible_unique_host_ssh_key": "true",
+    "ansible_configure_vagrant": "false",
+    "ansible_install_guest_tools": "true",
+    "ansible_remove_build_tools": "true",
+    "ansible_vmware_vm_tools": "dist",
+    "ansible_install_nfs": "false",
+    "whiteout": "true"
+  },
+  "sensitive-variables": ["vmware-password", "ssh_password"],
+  "builders": [
+    {
+      "type": "vmware-iso",
+      "vm_name": "{{ user `vm_name`}}",
+      "disk_size": "{{ user `disk_size`}}",
+      "disk_type_id": "thin",
+      "output_directory": "builds/vmware/{{ user `vm_name`}}",
+      "boot_wait": "10s",
+      "http_directory": "http",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
+      "ssh_port": 22,
+      "ssh_username": "{{user `ssh_username`}}",
+      "ssh_password": "{{user `ssh_password`}}",
+      "ssh_wait_timeout": "20000s",
+      "headless": "{{user `headless`}}",
+      "boot_command": [
+        "{{ user `boot_command_prefix` }}",
+        "/install/vmlinuz noapic",
+        " debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
+        " fb=false debconf/frontend=noninteractive",
+        " keyboard-configuration/modelcode=SKIP",
+        " keyboard-configuration/layout=USA",
+        " keyboard-configuration/variant=USA console-setup/ask_detect=false",
+        " netcfg/get_hostname={{ user `hostname` }}",
+        " passwd/root-login=true passwd/make-user=false",
+        " passwd/root-password={{user `ssh_password`}}",
+        " passwd/root-password-again={{user `ssh_password`}}",
+        " passwd/username={{ user `ssh_username` }}",
+        " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/{{ user `preseed` }}",
+        " initrd=/install/initrd.gz -- <enter> "
+      ],
+      "shutdown_command": "shutdown -h now",
+      "version": "{{user `vmware-vm-version`}}",
+      "remote_host": "{{user `vmware-host`}}",
+      "remote_datastore": "{{user `vmware-datastore`}}",
+      "remote_username": "{{user `vmware-username`}}",
+      "remote_password": "{{user `vmware-password`}}",
+      "remote_type": "esx5",
+      "format": "{{ user `vmware-output-format`}}",
+      "skip_validate_credentials": "true",
+      "ovftool_options": ["--overwrite"],
+      "vnc_bind_address": "0.0.0.0",
+      "vnc_disable_password": "true",
+      "vnc_port_min": 5900,
+      "vnc_port_max": 6000,
+      "vmx_data": {
+        "guestOS": "{{ user `vmware_guest_os_type` }}",
+        "memsize": "{{user `memory`}}",
+        "numvcpus": "{{user `cpus`}}",
+        "cpuid.coresPerSocket": "1",
+        "ethernet0.virtualDev": "vmxnet3",
+        "ethernet0.networkName": "{{user `vmware-network`}}",
+        "ethernet0.Address": "{{user `vmware-mac`}}",
+        "ethernet0.addressType": "static",
+        "ethernet0.pciSlotNumber": "32",
+        "scsi0:0.fileName": "disk.vmdk",
+        "scsi0:0.present": "TRUE",
+        "scsi0:0.redo": ""
+      },
+      "vmx_data_post": {
+        "ethernet0.addressType": "generated",
+        "ethernet0.Address": ""
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "{{.Vars}} bash '{{.Path}}'",
+      "script": "scripts/ansible.sh"
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "ansible/main.yml",
+      "galaxy_file": "requirements.yml",
+      "extra_arguments": [
+        "--extra-vars \"",
+        "packer_update_os={{user `ansible_update_os` }} ",
+        "packer_install_packages={{user `ansible_install_packages` }} ",
+        "packer_unique_host_ssh_key={{user `ansible_unique_host_ssh_key` }} ",
+        "packer_configure_vagrant={{user `ansible_configure_vagrant` }} ",
+        "packer_install_guest_tools={{user `ansible_install_guest_tools` }} ",
+        "packer_remove_build_tools={{user `ansible_remove_build_tools` }} ",
+        "packer_vmware_vm_tools={{user `ansible_vmware_vm_tools` }} ",
+        "packer_install_nfs={{user `ansible_install_nfs` }} ",
+        "\""
+      ],
+      "clean_staging_directory": "true"
+    },
+    {
+      "type": "shell",
+      "expect_disconnect": "true",
+      "environment_vars": [
+        "ANSIBLE_CLEANUP={{user `ansible_cleanup`}}",
+        "WHITEOUT={{user `whiteout`}}"
+      ],
+      "execute_command": "{{.Vars}} bash '{{.Path}}'",
+      "scripts": ["scripts/cleanup.sh"]
+    }
+  ]
+}
