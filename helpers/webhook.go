@@ -25,7 +25,13 @@ func SendWebhook(data Webhook, logger *log.Logger) {
 	}
 	logger.Println(string(requestBody))
 
-	location := Config.Locations[data.LocationId]
+	var location location
+
+	if data.LocationId == "" {
+		location = Config.Locations["DEFAULT"]
+	} else {
+		location = Config.Locations[data.LocationId]
+	}
 
 	req, err := http.NewRequest("POST", location.WebhookUrl, bytes.NewBuffer(requestBody))
 	if err != nil {
