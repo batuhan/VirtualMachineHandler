@@ -10,7 +10,7 @@ import (
 )
 
 func FindVM(id string, logger *log.Logger, baseVMName string, uuid uuid.UUID) (string, error) {
-	out, err := Execute(id, true, logger, "find", helpers.Config.Locations[id].TargetDirectory,
+	out, err := Execute(id, true, logger, "find", "vm/"+helpers.Config.Locations[id].TargetDirectory,
 		"-type", "m", "-name", "*"+baseVMName)
 	if err != nil {
 		logger.Println(err.Error())
@@ -50,8 +50,8 @@ func PowerOffVM(identifier string, vmName string, logger *log.Logger, uuid uuid.
 	}
 
 	out, err = Execute(identifier, true, logger, "object.collect", "-s",
-		fmt.Sprintf("-wait=%s", helpers.Config.PowerOffTimeout),
-		fmt.Sprintf("%s/%s", helpers.Config.Locations[identifier].TargetDirectory, vmName),
+		fmt.Sprintf("-wait=%ss", helpers.Config.PowerOffTimeout),
+		fmt.Sprintf("vm/%s/%s", helpers.Config.Locations[identifier].TargetDirectory, vmName),
 		"-runtime.powerState", "poweredOff")
 	if err != nil || len(out) == 0 {
 		var errorExplanation string
