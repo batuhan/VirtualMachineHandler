@@ -34,7 +34,7 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 
 	networkTemplate := helpers.CreateNetworkTemplate(body.LocationId, body.IpToAssign)
 
-	template := helpers.GenerateBaseTemplate(body.SshKey, body.OnFirstBoot)
+	template := helpers.GenerateBaseTemplate(body.SshKeys, body.OnFirstBoot)
 	var metadata *helpers.Metadata
 	lowerTemplate := strings.ToLower(body.Template)
 	isUbuntu := strings.Contains(lowerTemplate, "ubuntu")

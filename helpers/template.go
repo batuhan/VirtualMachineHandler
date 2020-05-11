@@ -63,14 +63,14 @@ type Metadata struct {
 	NetworkEncoding string `json:"network.encoding"`
 }
 
-func GenerateBaseTemplate(sshKey string, onFirstBoot []string) *Template {
+func GenerateBaseTemplate(sshKeys []string, onFirstBoot []string) *Template {
 	template := Template{}
 
 	template.PackageUpdate = false
 	template.PackageUpgrade = false
 
 	template.Users = []User{{
-		SshAuthorizedKeys: []string{sshKey},
+		SshAuthorizedKeys: sshKeys,
 	}}
 
 	template.Runcmd = onFirstBoot
