@@ -33,7 +33,7 @@ type Create struct {
 	Cpu         int
 	Memory      int
 	DiskSize    string
-	SshKey      string
+	SshKeys     []string
 	IpToAssign  string
 	OnFirstBoot []string
 }
