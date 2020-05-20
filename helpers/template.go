@@ -46,6 +46,7 @@ type Ethernet struct {
 	Nameservers struct {
 		Addresses []string
 	}
+	Dhcp4 bool
 }
 
 type Network struct {
@@ -130,6 +131,7 @@ func CreateNetworkTemplate(identifier string, ipToAssign string) *Network {
 	eth0.Addresses = []string{ipToAssign + "/24"}
 	eth0.Gateway4 = Config.Locations[identifier].Gateway
 	eth0.Nameservers.Addresses = Config.Locations[identifier].Nameservers
+	eth0.Dhcp4 = true
 	template.Network.Ethernets.Eth0 = eth0
 	template.Network.Ethernets.Ens192 = eth0
 	return &template
