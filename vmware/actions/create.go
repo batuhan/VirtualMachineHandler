@@ -1,12 +1,12 @@
 package actions
 
 import (
+	"VirtualMachineHandler/helpers"
+	"VirtualMachineHandler/vmware"
 	"encoding/base64"
 	"encoding/json"
 	"github.com/google/uuid"
 	"github.com/sethvargo/go-password/password"
-	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
-	"gitlab.com/nod/bigcore/VirtualMachineHandler/vmware"
 	"gopkg.in/yaml.v2"
 	"strconv"
 	"strings"

@@ -1,9 +1,9 @@
 package actions
 
 import (
+	"VirtualMachineHandler/helpers"
+	"VirtualMachineHandler/vmware"
 	"github.com/google/uuid"
-	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
-	"gitlab.com/nod/bigcore/VirtualMachineHandler/vmware"
 	"strconv"
 	"time"
 )

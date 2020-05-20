@@ -1,10 +1,10 @@
 package main
 
 import (
+	"VirtualMachineHandler/helpers"
+	"VirtualMachineHandler/vmware/actions"
 	"encoding/json"
 	"fmt"
-	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
-	"gitlab.com/nod/bigcore/VirtualMachineHandler/vmware/actions"
 	"log"
 	"net/http"
 	"net/http/httputil"

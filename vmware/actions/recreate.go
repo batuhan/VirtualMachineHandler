@@ -1,8 +1,8 @@
 package actions
 
 import (
+	"VirtualMachineHandler/helpers"
 	"github.com/google/uuid"
-	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
 )
 
 func Recreate(body helpers.Create, uuid uuid.UUID) {
