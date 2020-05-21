@@ -128,7 +128,9 @@ func CreateNetworkTemplate(identifier string, ipToAssign string) *Network {
 	template.Network.Version = 2
 	eth0 := template.Network.Ethernets.Eth0
 	eth0.Match.Name = "ens*"
-	eth0.Addresses = []string{ipToAssign + "/24"}
+	if ipToAssign != "" {
+		eth0.Addresses = []string{ipToAssign + "/24"}
+	}
 	eth0.Gateway4 = Config.Locations[identifier].Gateway
 	eth0.Nameservers.Addresses = Config.Locations[identifier].Nameservers
 	eth0.Dhcp4 = true
