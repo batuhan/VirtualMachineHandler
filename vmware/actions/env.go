@@ -1,9 +1,9 @@
 package actions
 
 import (
+	"VirtualMachineHandler/helpers"
+	"VirtualMachineHandler/vmware"
 	"fmt"
-	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
-	"gitlab.com/nod/bigcore/VirtualMachineHandler/vmware"
 	"net/http"
 	"strings"
 )

@@ -1,7 +1,7 @@
 package vmware
 
 import (
-	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
+	"VirtualMachineHandler/helpers"
 	"log"
 	"os/exec"
 )

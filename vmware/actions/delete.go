@@ -1,9 +1,9 @@
 package actions
 
 import (
+	"VirtualMachineHandler/helpers"
+	"VirtualMachineHandler/vmware"
 	"github.com/google/uuid"
-	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
-	"gitlab.com/nod/bigcore/VirtualMachineHandler/vmware"
 )
 
 func Delete(identifier string, targetName string, uuid uuid.UUID) error {

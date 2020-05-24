@@ -1,10 +1,10 @@
 package vmware
 
 import (
+	"VirtualMachineHandler/helpers"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
-	"gitlab.com/nod/bigcore/VirtualMachineHandler/helpers"
 	"log"
 	"strings"
 )
