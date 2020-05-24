@@ -15,6 +15,7 @@ type Webhook struct {
 	Password         string `json:"password,omitempty"`
 	VCenterId        string `json:"vCenterId,omitempty"`
 	LocationId       string `json:"locationId,omitempty"`
+	MacAddress       string `json:"macAddress,omitempty"`
 }
 
 func SendWebhook(data Webhook, logger *log.Logger) {

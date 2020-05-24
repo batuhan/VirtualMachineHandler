@@ -15,6 +15,13 @@ type VMInfoDump struct {
 		Self struct {
 			Value string
 		}
+		Config struct {
+			Hardware struct {
+				Device []struct {
+					MacAddress string
+				}
+			}
+		}
 	}
 }
 
@@ -25,4 +32,14 @@ func ParseVMInfoDump(output []byte, logger *log.Logger) VMInfoDump {
 		logger.Println(err.Error())
 	}
 	return dump
+}
+
+func GetMacAddress(devices []struct{ MacAddress string }) string {
+	for _, device := range devices {
+		macAddress := device.MacAddress
+		if macAddress != "" {
+			return macAddress
+		}
+	}
+	return ""
 }

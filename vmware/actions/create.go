@@ -207,11 +207,14 @@ func Create(body helpers.Create, uuid uuid.UUID) {
 		return
 	}
 
+	vmInfoDump := helpers.ParseVMInfoDump(out, logger).VirtualMachines[0]
+
 	go helpers.SendWebhook(helpers.Webhook{
-		Uuid:      uuid.String(),
-		Step:      "powerOnVM",
-		Success:   true,
-		Password:  pass,
-		VCenterId: helpers.ParseVMInfoDump(out, logger).VirtualMachines[0].Self.Value,
+		Uuid:       uuid.String(),
+		Step:       "powerOnVM",
+		Success:    true,
+		Password:   pass,
+		VCenterId:  vmInfoDump.Self.Value,
+		MacAddress: helpers.GetMacAddress(vmInfoDump.Config.Hardware.Device),
 	}, logger)
 }
